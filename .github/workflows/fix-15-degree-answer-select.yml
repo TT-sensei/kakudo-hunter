@@ -1,0 +1,51 @@
+name: Fix 15 degree answer selector
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix only 15 degree game answer choices
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+
+          # Remove the previous, wrongly targeted start-screen selector patch.
+          s = re.sub(r'\n<style id="compact-15-degree-select">.*?</style>\n', '\n', s, flags=re.S)
+          s = re.sub(r'\n<script id="compact-15-degree-script">.*?</script>\n', '\n', s, flags=re.S)
+
+          css = '''\n<style id="answer-15-degree-select-style">\n#angles .angle-select{width:100%;min-height:54px;padding:8px 46px 8px 16px;border:2px solid var(--line);border-radius:13px;background:#fff;color:var(--navy);font:inherit;font-size:1.05rem;font-weight:900;box-shadow:0 3px 8px rgba(24,42,67,.06);cursor:pointer;touch-action:manipulation}\n#angles .angle-select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}\n@media(max-width:1050px){#angles .angle-select{min-height:54px;font-size:1rem}}\n</style>\n'''
+          if 'answer-15-degree-select-style' not in s:
+              s = s.replace('</head>', css + '</head>', 1)
+
+          new_func = '''function buildAngles(){const box=$('angles');box.innerHTML='';if(step===15){const s=document.createElement('select');s.className='angle-select';s.setAttribute('aria-label','答えの角度を選択');const first=document.createElement('option');first.value='';first.textContent='角度を選ぶ';first.disabled=true;first.selected=true;s.appendChild(first);for(let d=0;d<360;d+=15){const o=document.createElement('option');o.value=String(d);o.textContent=d+'°';s.appendChild(o)}s.addEventListener('change',ev=>{const d=Number(ev.target.value);answer(d,s)});box.appendChild(s);return}for(let d=0;d<360;d+=step){const b=document.createElement('button');b.type='button';b.className='angle';b.textContent=d+'°';const choose=ev=>{ev.preventDefault();answer(d,b)};b.addEventListener('pointerup',choose);box.appendChild(b)}}'''
+
+          pattern = r'function buildAngles\(\)\{.*?\}function setLine'
+          replacement = new_func + 'function setLine'
+          s2, n = re.subn(pattern, replacement, s, count=1, flags=re.S)
+          if n != 1:
+              raise SystemExit(f'buildAngles replacement failed: {n}')
+          s = s2
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix: use dropdown only for 15 degree answers" || true
+          git rm .github/workflows/fix-15-degree-answer-select.yml
+          git commit -m "chore: remove temporary 15 degree fix workflow"
+          git push
