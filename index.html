@@ -30,7 +30,7 @@
 <script>
 const NAV='https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/web/fantasy/monsters/zako/';
 const NAVIANS=['acorn-leafy.webp','aurora-shell-lizard.webp','autumn-mushroom.webp','berry-leafy.webp','bubblefin-frog.webp','candy-coral-slug.webp','cloud-rain-rabbit.webp','clover-mandragora.webp','cobalt-blade-mantis.webp','coral-bubble-crab.webp','dusk-feather-owl.webp','forest-puru.webp','happa-squirrel-leafy.webp','hinoko-ember-newt.webp','kinoko-apple-mushroom.webp','komorin-little-night-bat.webp','koro-golem-pebble-golem.webp','mofu-wolf-frost-pup.webp','purun-little-magic-slime.webp','yukimaru-snow-puff.webp'];
-const NAMES=['アカーン・リーフィ','オーロラ・シェルリザード','オータム・マッシュルーム','ベリー・リーフィ','バブルフィン・フロッグ','キャンディ・コーラルスラッグ','クラウドレイン・ラビット','クローバー・マンドラゴラ','コバルトブレード・マンティス','コーラルバブル・クラブ','ダスクフェザー・オウル','フォレスト・プルー','ハッパ・リーフィ','ヒノコ・エンバーニュート','キノコ・アップルマッシュルーム','こもりん・リトルナイトバット','コロ・ゴーレム','モフ・ウルフ','ぷるん・リトルマジックスライム','ゆきまる・スノーパフ'];
+const NAMES=['どんぐりリーフ','オーロラシェルリザード','オータムキノコ','ベリーリーフ','バブルフィンカエル','キャンディコーラルナメクジ','くもあめウサギ','クローバーマンドラゴラ','コバルトブレードカマキリ','コーラルバブルクラブ','たそがれフクロウ','森ぷる','はっぱリス','ひのこイモリ','りんごキノコ','こもりんナイトバット','ころゴーレム','もふウルフ','ぷるんスライム','ゆきまるスノーパフ'];
 const $=id=>document.getElementById(id), C={cx:200,cy:200,r:155,navR:132};
 let step=30,mode='hunter',target=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats();
 function loadStats(){try{return JSON.parse(localStorage.getItem('angleHunter.stats.v2'))||{attempts:0,correct:0,weak:{}}}catch(e){return{attempts:0,correct:0,weak:{}}}}
