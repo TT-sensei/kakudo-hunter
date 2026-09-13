@@ -28,7 +28,12 @@
 .protractor-card{width:98%}
 .protractor-navian{width:64px;height:64px}
 }
-</style></head><body>
+</style>
+<style id="compact-15-degree-select">
+.step-select-compact{display:block;margin-top:12px}.step-select-compact select{width:100%;min-height:48px;padding:8px 42px 8px 14px;border:2px solid var(--line);border-radius:12px;background:#f8fafc;color:var(--navy);font:inherit;font-size:1rem;font-weight:900;cursor:pointer}.step-select-compact select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}
+.step-select-compact .step-btn{display:none!important}
+</style>
+</head><body>
 <div id="start" class="deco-fantasy"><div class="start-card"><div class="start-head"><img class="town-group" src="https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/groups/group-fantasy-town.png" alt="ナビアンのなかまたち"><div class="start-title"><h1>ANGLE HUNTER</h1><p>角度を見抜け。ナビアンをつかまえろ。</p></div></div><div class="mode-grid"><div class="mode"><span class="mode-mark">◈</span><b>ハンターモード</b><span class="mode-desc">角度のきざみを選んで、ナビアンをつかまえよう。</span><div class="step-select"><button class="step-btn" data-mode="hunter" data-step="30">30°</button><button class="step-btn" data-mode="hunter" data-step="15">15°</button><button class="step-btn" data-mode="hunter" data-step="1">1°</button></div></div><div class="mode"><span class="mode-mark">◆</span><b>チャレンジモード</b><span class="mode-desc">60秒で何体つかまえられる？角度のきざみを選んで挑戦しよう。</span><div class="step-select"><button class="step-btn" data-mode="challenge" data-step="30">30°</button><button class="step-btn" data-mode="challenge" data-step="15">15°</button><button class="step-btn" data-mode="challenge" data-step="1">1°</button></div></div><button class="mode book-mode" onclick="location.href='book.html'" data-mode="book"><span class="mode-mark">▣</span><b>ナビアン図鑑</b><span class="mode-desc">出会えるナビアンを一覧でチェック。</span></button></div><p class="start-note">30°・15°・1°から選ぼう　｜　見る → 考える → 角度を読む → つかまえる</p></div></div>
 <div id="app" class="hidden"><header class="topbar"><div class="brand"><h1>ANGLE HUNTER</h1><p id="brandHint">ナビアンが止まった角度を見抜こう</p></div><div class="actions"><span class="pill active" id="stepLabel">30°</span><button class="head-btn" id="titleBtn">タイトル</button></div></header><div class="game" id="normalGame"><div class="arena-wrap"><div class="arena" id="stage"><div class="field" id="field"></div><div class="zero-line"></div><div class="aim" id="aim"></div><div class="correct-line" id="correctLine"></div><div class="net" id="net"></div><div class="center"></div><img class="navian" id="navian" alt="ナビアン"><div class="message" id="message"></div></div></div><aside class="side"><div class="panel"><h2 id="recordTitle">きろく</h2><div class="stat"><span>ちょうせん</span><b id="attempts">0</b></div><div class="stat"><span>せいかい</span><b id="correct">0</b></div><div class="stat"><span>せいかい率</span><b id="rate">0%</b></div></div><div class="panel" id="challengePanel"><h2>チャレンジ</h2><div class="stat"><span>のこり時間</span><b class="challenge-timer" id="timer">60</b></div><div class="stat"><span>捕獲数</span><b class="challenge-score" id="score">0</b></div></div><div class="panel"><span class="mode-label" id="modeLabel">ハンター</span><p class="hint">ナビアンが止まった位置と、0°の線をくらべて角度を選ぼう。</p></div></aside><div id="angles"></div><button id="next">つぎのナビアン ▶</button></div>
 <div id="protractorGame" class="game hidden"><div class="arena-wrap" id="protractorView"><div class="protractor-card" id="protractorCard"><div class="protractor-label" id="protractorLabel">分度器で角度を読もう</div><svg id="protractorSvg" class="protractor-svg" viewBox="0 0 800 424" aria-label="180度分度器"><path d="M 114 370 A 286 286 0 0 1 686 370" fill="none" stroke="#24344f" stroke-width="2.5"/><path d="M 150 370 A 250 250 0 0 1 650 370" fill="none" stroke="#b8c4d1" stroke-width="1.5"/><g id="protractorTicks"></g><g id="protractorNumbers"></g><path id="protractorAngleArc" d="" fill="none" stroke="#168b68" stroke-width="7" stroke-linecap="round"/></svg><div class="protractor-base"></div><div class="protractor-center"></div><div class="protractor-ray" id="protractorRay"></div><div class="protractor-correct-line" id="protractorCorrectLine"></div><img class="protractor-navian" id="protractorNavian" alt="ナビアン"><span class="protractor-direction left">0°側</span><span class="protractor-direction right">180°側</span></div><div class="protractor-question"><span class="protractor-help">ナビアンが止まった線は、何度？</span><input id="degreeInput" class="degree-input" type="number" inputmode="numeric" min="0" max="180" step="1" aria-label="角度"><span class="degree-unit">°</span><button id="degreeSubmit" class="degree-submit">答える</button></div><button id="protractorNext">つぎのナビアン ▶</button></div></div>
@@ -64,5 +69,35 @@ document.addEventListener('click',function(e){
   const b=e.target.closest('.book-mode');
   if(b){e.preventDefault();e.stopImmediatePropagation();location.href='book.html';}
 },true);
+</script>
+
+<script id="compact-15-degree-script">
+(()=>{
+  const modes=[...document.querySelectorAll('.mode')];
+  const mode=modes.find(el=>/15\s*[°度]/.test(el.textContent));
+  if(!mode)return;
+  const wrap=mode.querySelector('.step-select');
+  if(!wrap||wrap.querySelector('select'))return;
+  const buttons=[...wrap.querySelectorAll('.step-btn')];
+  if(!buttons.length)return;
+  const box=document.createElement('div');
+  box.className='step-select-compact';
+  const select=document.createElement('select');
+  select.setAttribute('aria-label','15度モードの角度を選択');
+  buttons.forEach((btn,i)=>{
+    const opt=document.createElement('option');
+    opt.value=String(i);
+    opt.textContent=btn.textContent.trim();
+    if(btn.classList.contains('active'))opt.selected=true;
+    select.appendChild(opt);
+  });
+  select.addEventListener('change',()=>{
+    const btn=buttons[Number(select.value)];
+    if(btn)btn.click();
+  });
+  box.appendChild(select);
+  wrap.classList.add('compact-15-wrap');
+  wrap.appendChild(box);
+})();
 </script>
 </body></html>
