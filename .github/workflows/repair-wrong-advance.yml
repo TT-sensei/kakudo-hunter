@@ -1,9 +1,10 @@
 name: repair wrong advance
 on:
-  push:
-    branches: [main]
+  issues:
+    types: [opened]
 jobs:
   repair:
+    if: github.event.issue.title == 'ANGLE-HUNTER-repair'
     runs-on: ubuntu-latest
     permissions:
       contents: write
