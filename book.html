@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>ナビアン図鑑 - ANGLE HUNTER</title>
 <style>
-:root{--bg:#eef3f7;--navy:#17233b;--muted:#667085;--line:#d9e1ea}
+:root{--bg:#eef3f7;--navy:#17233b;--muted:#667085;--line:#d9e1ea;--gold:#e3a400;--gold2:#fff2c7}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;min-height:100%;background:var(--bg);color:var(--navy);font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif}
 body{overflow:auto}
@@ -13,19 +13,23 @@ body{overflow:auto}
 .book-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
 .book-head h1{margin:0;font-size:clamp(1.4rem,4vw,2rem)}
 .book-head p{margin:4px 0 0;color:var(--muted);font-size:.78rem}
+.book-head p b{color:var(--navy)}
 .head-btn{min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-weight:800;cursor:pointer}
 .book-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .book-card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;text-align:center;box-shadow:0 3px 10px rgba(24,42,67,.06)}
 .book-card img{display:block;width:100%;height:140px;object-fit:contain}
-.book-card span{display:block;margin-top:7px;color:var(--muted);font-size:.72rem;line-height:1.4;font-weight:700}
+.book-card.locked img{filter:brightness(0);opacity:.82}
+.book-card.locked span{color:#7b8492}
+.book-card .count{display:block;margin-top:5px;color:var(--gold);font-size:.72rem;font-weight:900}
+.book-card.locked .count{color:#98a1ad}
 @media(max-width:900px){.book-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
-@media(max-width:600px){.book-shell{padding:14px}.book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.book-card{padding:7px;border-radius:13px}.book-card img{height:105px}.book-card span{font-size:.64rem}}
+@media(max-width:600px){.book-shell{padding:14px}.book-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.book-card{padding:7px;border-radius:13px}.book-card img{height:105px}.book-card span{font-size:.64rem}.book-card .count{font-size:.62rem}}
 </style>
 </head>
 <body>
 <main class="book-shell">
   <header class="book-head">
-    <div><h1>ナビアン図鑑</h1><p>ナビアンたちを見てみよう</p></div>
+    <div><h1>ナビアン図鑑</h1><p>発見したナビアン <b id="bookProgress">0 / 20 種</b></p></div>
     <button class="head-btn" id="bookBack">タイトルへ</button>
   </header>
   <section class="book-grid" id="bookGrid" aria-label="ナビアン図鑑"></section>
@@ -34,8 +38,13 @@ body{overflow:auto}
 const NAV='https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/web/fantasy/monsters/zako/';
 const NAVIANS=['acorn-leafy.webp','aurora-shell-lizard.webp','autumn-mushroom.webp','berry-leafy.webp','bubblefin-frog.webp','candy-coral-slug.webp','cloud-rain-rabbit.webp','clover-mandragora.webp','cobalt-blade-mantis.webp','coral-bubble-crab.webp','dusk-feather-owl.webp','forest-puru.webp','happa-squirrel-leafy.webp','hinoko-ember-newt.webp','kinoko-apple-mushroom.webp','komorin-little-night-bat.webp','koro-golem-pebble-golem.webp','mofu-wolf-frost-pup.webp','purun-little-magic-slime.webp','yukimaru-snow-puff.webp'];
 const NAMES=['どんぐりリーフ','オーロラシェルリザード','オータムキノコ','ベリーリーフ','バブルリーフ','キャンディコーラルナメクジ','くもあめウサギ','クローバーマンドラゴラ','コバルトブレードカマキリ','コーラルバブルクラブ','たそがれフクロウ','森ぷる','はっぱリス','ひのこイモリ','りんごキノコ','こもりんナイトバット','ころゴーレム','もふウルフ','ぷるんスライム','ゆきまるスノーパフ'];
+const KEY='angleHunter.navianGets.v1';
+function loadGets(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+const gets=loadGets();
 const grid=document.getElementById('bookGrid');
-NAVIANS.forEach((file,i)=>{const card=document.createElement('article');card.className='book-card';const img=document.createElement('img');img.src=NAV+file;img.alt=NAMES[i];img.loading='lazy';const name=document.createElement('span');name.textContent=NAMES[i];card.append(img,name);grid.appendChild(card)});
+let discovered=0;
+NAVIANS.forEach((file,i)=>{const count=Number(gets[file]||0);if(count>0)discovered++;const card=document.createElement('article');card.className='book-card'+(count?'':' locked');const img=document.createElement('img');img.src=NAV+file;img.alt=count?NAMES[i]:'未発見のナビアン';img.loading='lazy';const name=document.createElement('span');name.textContent=count?NAMES[i]:'？？？';const total=document.createElement('span');total.className='count';total.textContent=count?`ゲット × ${count}`:'未発見';card.append(img,name,total);grid.appendChild(card)});
+document.getElementById('bookProgress').textContent=`${discovered} / ${NAVIANS.length} 種`;
 document.getElementById('bookBack').onclick=()=>location.href='./';
 </script>
 </body>
