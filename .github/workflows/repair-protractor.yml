@@ -21,27 +21,17 @@ jobs:
           s=s.replace(old,new,1)
           start="function spawnProtractor(){"
           i=s.index(start); j=s.index("function answerProtractor(){",i)
-          old_spawn=s[i:j]
           new_spawn="function spawnProtractor(){locked=false;$(\'degreeInput\').value=\'\';$(\'degreeInput\').className=\'degree-input\';$(\'degreeSubmit\').disabled=true;$(\'protractorNavian\').className=\'protractor-navian\';$(\'protractorRay\').className=\'protractor-ray show\';$(\'protractorCorrectLine\').className=\'protractor-correct-line\';$(\'protractorNavian\').src=NAV+randomNav();target=Math.floor(Math.random()*179)+1;const fromLeft=Math.random()<.5;protractorVisualTarget=fromLeft?target:180-target;window.protractorArcStart=fromLeft?0:180;$(\'protractorLabel\').textContent=fromLeft?\'左の0°から読もう\':\'右の0°から読もう\';$(\'protractorLabel\').className=\'protractor-label\';setProtractorArc(window.protractorArcStart,window.protractorArcStart);$(\'protractorNavian\').classList.add(\'running\');const t0=performance.now(),duration=1050;function tick(t){const p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,2),deg=window.protractorArcStart+(protractorVisualTarget-window.protractorArcStart)*e;protractorPos(deg);if(p<1)anim=requestAnimationFrame(tick);else{locked=true;anim=null;protractorPos(protractorVisualTarget);$(\'protractorNavian\').classList.remove(\'running\');$(\'degreeSubmit\').disabled=false}}anim=requestAnimationFrame(tick)}\n"
           s=s[:i]+new_spawn+s[j:]
           start="function answerProtractor(){"
           i=s.index(start); j=s.index("function feedbackPro(",i)
-          old_answer=s[i:j]
           new_answer="function answerProtractor(){if(!locked)return;const input=$(\'degreeInput\'),value=Number(input.value);if(!Number.isInteger(value)||value<0||value>180)return;locked=false;$(\'degreeSubmit\').disabled=true;stats.attempts++;const ok=Math.abs(value-target)<=1;if(ok){stats.correct++;score++;input.classList.add(\'protractor-correct\');$(\'protractorNavian\').classList.add(\'caught\');$(\'protractorCorrectLine\').className=\'protractor-correct-line show\';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro(\'ぴったり！ \'+target+\'°\',\'hit\')}else{stats.weak[target]=(stats.weak[target]||0)+1;input.classList.add(\'protractor-wrong\');$(\'protractorCorrectLine\').className=\'protractor-correct-line show\';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro(\'正解は \'+target+\'°。目盛をもう一度確認しよう\',\'miss\')}saveStats();renderStats();if(mode===\'challenge\'){setTimeout(()=>{if(timeLeft>0)spawnProtractor()},ok?260:380)}else setTimeout(()=>{spawnProtractor()},ok?650:1000)}"
           s=s[:i]+new_answer+s[j:]
           p.write_text(s,encoding='utf-8')
           PY
-      - name: commit fix
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add index.html
-          git diff --cached --quiet || git commit -m 'fix protractor direction progression and angle arc'
-          git push
-      - name: remove temporary workflow
-        run: |
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git rm .github/workflows/repair-protractor.yml
-          git commit -m 'chore remove temporary repair workflow'
-          git push
+      - name: upload patched index
+        uses: actions/upload-artifact@v4
+        with:
+          name: patched-index
+          path: index.html
+          if-no-files-found: error
