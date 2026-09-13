@@ -1,0 +1,53 @@
+name: Fix start screen layout
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch start screen CSS
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          old = '''#start{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:20px;background:'''
+          new = '''#start{position:fixed;inset:0;z-index:50;display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:20px 14px 28px;background:'''
+          if old not in s:
+              raise SystemExit('start selector not found')
+          s = s.replace(old, new, 1)
+          s = s.replace('''}.start-card{width:min(1050px,100%);padding:34px;''', '''}.start-card{width:min(1050px,100%);margin:0 auto;padding:34px;''', 1)
+          s = s.replace('''.mode-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px}''', '''.mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}''', 1)
+          s = s.replace('''.mode{min-height:150px;padding:20px;''', '''.mode{min-height:150px;padding:18px;''', 1)
+          s = s.replace('''.mode-mark{display:block;font-size:1.8rem;color:var(--green);margin-bottom:10px}''', '''.mode-mark{display:block;font-size:1.65rem;color:var(--green);margin-bottom:7px}''', 1)
+          s = s.replace('''.mode b{display:block;font-size:1.1rem;margin-bottom:8px}''', '''.mode b{display:block;font-size:1.02rem;margin-bottom:6px}''', 1)
+          s = s.replace('''.mode-desc{color:var(--muted);font-size:.82rem;line-height:1.7}''', '''.mode-desc{color:var(--muted);font-size:.78rem;line-height:1.55}''', 1)
+          s = s.replace('''.step-select{display:flex;gap:8px;margin-top:16px}''', '''.step-select{display:flex;gap:6px;margin-top:12px}''', 1)
+          s = s.replace('''.step-btn{flex:1;min-height:48px;''', '''.step-btn{flex:1;min-width:0;min-height:46px;padding:6px 4px;''', 1)
+          s = s.replace('''.book-mode{grid-column:1/-1;min-height:105px}''', '''.book-mode{grid-column:auto;min-height:150px}''', 1)
+          s = s.replace(''' html,body{overflow:hidden}''', ''' html,body{overflow:hidden}''', 1)
+          s = s.replace(''' .mode-grid{grid-template-columns:1fr}''', ''' .mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}''', 1)
+          s = s.replace(''' .mode{min-height:95px}''', ''' .mode{min-height:150px;padding:14px}''', 1)
+          s = s.replace(''' .book-mode{grid-column:auto}''', ''' .book-mode{grid-column:auto;min-height:150px}''', 1)
+          marker = '''@media(max-width:700px){.mode-grid{grid-template-columns:1fr}.book-mode{min-height:95px}.start-card{padding:22px 17px}.start-head{gap:10px}.town-group{width:78px;height:78px}.start-title h1{font-size:1.7rem}}'''
+          if '@media(max-width:700px){.mode-grid{grid-template-columns:1fr}' not in s:
+              s = s.replace('</style>', marker + '</style>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit patch and remove temporary workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix: make start screen scrollable and align modes" || true
+          git rm .github/workflows/fix-start-layout.yml
+          git commit -m "chore: remove temporary layout workflow"
+          git push
