@@ -6,7 +6,42 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); s=s.replace('function answerProtractor(){if(!locked)return;','function answerProtractor(){if(!locked)return;'); p.write_text(s)"
-      - run: git config user.name github-actions[bot]
-      - run: git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-      - run: git add index.html && git diff --cached --quiet || git commit -m 'repair protractor'; git push
+      - name: patch
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          if 'id="protractorAngleArc"' not in s:
+              s=s.replace('<g id="protractorTicks"></g><g id="protractorNumbers"></g>','<g id="protractorTicks"></g><g id="protractorNumbers"></g><path id="protractorAngleArc" d="" fill="none" stroke="#168b68" stroke-width="7" stroke-linecap="round"/>',1)
+          old="function protractorPos(deg){const p=proPoint(deg,320);$('protractorNavian').style.left=p.x/800*100+'%';$('protractorNavian').style.top=p.y/424*100+'%';setProtractorLine(deg)}"
+          new="function setProtractorArc(startDeg,endDeg){const arc=$('protractorAngleArc');if(!arc)return;const r=92,rad=d=>(Math.PI-d*Math.PI/180),pt=d=>({x:400+Math.cos(rad(d))*r,y:370-Math.sin(rad(d))*r}),a=pt(startDeg),b=pt(endDeg),sweep=endDeg>startDeg?1:0;arc.setAttribute('d',`M ${a.x} ${a.y} A ${r} ${r} 0 0 ${sweep} ${b.x} ${b.y}`)}\nfunction protractorPos(deg){const p=proPoint(deg,320);$('protractorNavian').style.left=p.x/800*100+'%';$('protractorNavian').style.top=p.y/424*100+'%';setProtractorLine(deg);setProtractorArc(window.protractorArcStart??0,deg)}"
+          if old not in s: raise SystemExit('protractorPos not found')
+          s=s.replace(old,new,1)
+          start="function spawnProtractor(){"
+          i=s.index(start); j=s.index("function answerProtractor(){",i)
+          old_spawn=s[i:j]
+          new_spawn="function spawnProtractor(){locked=false;$(\'degreeInput\').value=\'\';$(\'degreeInput\').className=\'degree-input\';$(\'degreeSubmit\').disabled=true;$(\'protractorNavian\').className=\'protractor-navian\';$(\'protractorRay\').className=\'protractor-ray show\';$(\'protractorCorrectLine\').className=\'protractor-correct-line\';$(\'protractorNavian\').src=NAV+randomNav();target=Math.floor(Math.random()*179)+1;const fromLeft=Math.random()<.5;protractorVisualTarget=fromLeft?target:180-target;window.protractorArcStart=fromLeft?0:180;$(\'protractorLabel\').textContent=fromLeft?\'左の0°から読もう\':\'右の0°から読もう\';$(\'protractorLabel\').className=\'protractor-label\';setProtractorArc(window.protractorArcStart,window.protractorArcStart);$(\'protractorNavian\').classList.add(\'running\');const t0=performance.now(),duration=1050;function tick(t){const p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,2),deg=window.protractorArcStart+(protractorVisualTarget-window.protractorArcStart)*e;protractorPos(deg);if(p<1)anim=requestAnimationFrame(tick);else{locked=true;anim=null;protractorPos(protractorVisualTarget);$(\'protractorNavian\').classList.remove(\'running\');$(\'degreeSubmit\').disabled=false}}anim=requestAnimationFrame(tick)}\n"
+          s=s[:i]+new_spawn+s[j:]
+          start="function answerProtractor(){"
+          i=s.index(start); j=s.index("function feedbackPro(",i)
+          old_answer=s[i:j]
+          new_answer="function answerProtractor(){if(!locked)return;const input=$(\'degreeInput\'),value=Number(input.value);if(!Number.isInteger(value)||value<0||value>180)return;locked=false;$(\'degreeSubmit\').disabled=true;stats.attempts++;const ok=Math.abs(value-target)<=1;if(ok){stats.correct++;score++;input.classList.add(\'protractor-correct\');$(\'protractorNavian\').classList.add(\'caught\');$(\'protractorCorrectLine\').className=\'protractor-correct-line show\';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro(\'ぴったり！ \'+target+\'°\',\'hit\')}else{stats.weak[target]=(stats.weak[target]||0)+1;input.classList.add(\'protractor-wrong\');$(\'protractorCorrectLine\').className=\'protractor-correct-line show\';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro(\'正解は \'+target+\'°。目盛をもう一度確認しよう\',\'miss\')}saveStats();renderStats();if(mode===\'challenge\'){setTimeout(()=>{if(timeLeft>0)spawnProtractor()},ok?260:380)}else setTimeout(()=>{spawnProtractor()},ok?650:1000)}"
+          s=s[:i]+new_answer+s[j:]
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: commit fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m 'fix protractor direction progression and angle arc'
+          git push
+      - name: remove temporary workflow
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/repair-protractor.yml
+          git commit -m 'chore remove temporary repair workflow'
+          git push
