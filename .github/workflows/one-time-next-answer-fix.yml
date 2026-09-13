@@ -1,0 +1,43 @@
+name: one-time next answer fix
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch index.html
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="saveStats();renderStats();setTimeout(()=>{if(mode!=='challenge'||timeLeft>0)spawn()},ok?260:1000)"
+          new="saveStats();renderStats();if(mode==='challenge'){setTimeout(()=>{if(timeLeft>0)spawn()},ok?260:1000)}else{$('next').style.display='inline-flex'}"
+          if old not in s:
+              raise SystemExit('normal answer tail not found')
+          s=s.replace(old,new,1)
+          old2="else setTimeout(()=>{spawnProtractor()},ok?650:1000)"
+          new2="else $('next').style.display='inline-flex'"
+          if old2 not in s:
+              raise SystemExit('protractor answer tail not found')
+          s=s.replace(old2,new2,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify answer logic
+        run: |
+          grep -q "const ok=choice===target" index.html
+          grep -q "if(mode==='challenge'){setTimeout" index.html
+          grep -q "\$('next').style.display='inline-flex'" index.html
+      - name: Commit and remove workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/one-time-next-answer-fix.yml
+          git commit -m 'fix next button flow and keep challenge auto advance'
+          git push
