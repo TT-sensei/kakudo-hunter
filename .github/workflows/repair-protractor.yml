@@ -1,0 +1,12 @@
+name: repair protractor
+on: push
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: python -c "from pathlib import Path; p=Path('index.html'); s=p.read_text(); s=s.replace('function answerProtractor(){if(!locked)return;','function answerProtractor(){if(!locked)return;'); p.write_text(s)"
+      - run: git config user.name github-actions[bot]
+      - run: git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+      - run: git add index.html && git diff --cached --quiet || git commit -m 'repair protractor'; git push
