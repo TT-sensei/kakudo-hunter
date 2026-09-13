@@ -1,0 +1,36 @@
+name: Fix tablet start layout
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch tablet and phone layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          s = s.replace('.mode-grid{grid-template-columns:1fr}.mode{min-height:95px}.book-mode{grid-column:auto}', '.mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.mode{min-height:150px;padding:14px}.book-mode{grid-column:auto;min-height:150px}', 1)
+          phone = '@media(max-width:700px){.mode-grid{grid-template-columns:1fr}.book-mode{min-height:95px}}'
+          if phone not in s:
+              s = s.replace('</style>', phone + '</style>', 1)
+          p.write_text(s, encoding='utf-8')
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix: keep start modes horizontal on tablets" || true
+          git rm .github/workflows/fix-start-layout-2.yml
+          git commit -m "chore: remove temporary tablet layout workflow"
+          git push
