@@ -1,0 +1,36 @@
+name: final angle fix
+on:
+  issues:
+    types: [opened]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch current main
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          s=s.replace('const ok=Math.abs(value-target)<=1','const ok=value===target')
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Verify
+        run: |
+          grep -q "const ok=value===target" index.html
+          grep -q "if(mode==='challenge'){setTimeout" index.html
+          grep -q "\$('next').style.display='inline-flex'" index.html
+          ! grep -q "Math.abs(value-target)<=1" index.html
+      - name: Commit final state and remove all temporary workflows
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          rm -f .github/workflows/final-angle-fix.yml .github/workflows/one-time-exact-angle-fix.yml .github/workflows/one-time-next-answer-fix.yml
+          git add index.html .github/workflows
+          git commit -m 'fix angle answer validation and finalize question flow' || exit 0
+          git push origin HEAD:main --force-with-lease
