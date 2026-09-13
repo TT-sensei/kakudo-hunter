@@ -1,0 +1,46 @@
+name: Fix protractor pop position
+on:
+  push:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.event.head_commit.message != 'chore: remove temporary protractor pop workflow'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move actual protractor label above answer area
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          pattern=r'<div class="protractor-label" id="protractorLabel">.*?</div>'
+          m=re.search(pattern,s,flags=re.S)
+          if not m:
+              raise SystemExit('protractorLabel not found')
+          label=m.group(0)
+          s=s[:m.start()]+s[m.end():]
+          marker='<div class="protractor-question">'
+          if marker not in s:
+              raise SystemExit('protractor-question not found')
+          s=s.replace(marker,label+marker,1)
+          old='.protractor-label{position:absolute;left:50%;top:9%;transform:translateX(-50%);z-index:10;padding:7px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap}'
+          new='.protractor-label{grid-column:1;position:static;justify-self:center;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap;margin:0 0 4px}'
+          if old not in s:
+              raise SystemExit('old protractor-label CSS not found')
+          s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary workflows
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'fix: move protractor reading pop above answer input'
+          rm -f .github/workflows/fix-protractor-pop.yml .github/workflows/move-protractor-hint-run.yml .github/workflows/trigger-protractor-hint-fix.txt
+          git add -A .github/workflows
+          git diff --cached --quiet || git commit -m 'chore: remove temporary protractor pop workflow'
+          git push
