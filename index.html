@@ -29,9 +29,11 @@
 .protractor-navian{width:64px;height:64px}
 }
 </style>
-<style id="compact-15-degree-select">
-.step-select-compact{display:block;margin-top:12px}.step-select-compact select{width:100%;min-height:48px;padding:8px 42px 8px 14px;border:2px solid var(--line);border-radius:12px;background:#f8fafc;color:var(--navy);font:inherit;font-size:1rem;font-weight:900;cursor:pointer}.step-select-compact select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}
-.step-select-compact .step-btn{display:none!important}
+
+<style id="answer-15-degree-select-style">
+#angles .angle-select{width:100%;min-height:54px;padding:8px 46px 8px 16px;border:2px solid var(--line);border-radius:13px;background:#fff;color:var(--navy);font:inherit;font-size:1.05rem;font-weight:900;box-shadow:0 3px 8px rgba(24,42,67,.06);cursor:pointer;touch-action:manipulation}
+#angles .angle-select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}
+@media(max-width:1050px){#angles .angle-select{min-height:54px;font-size:1rem}}
 </style>
 </head><body>
 <div id="start" class="deco-fantasy"><div class="start-card"><div class="start-head"><img class="town-group" src="https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/groups/group-fantasy-town.png" alt="ナビアンのなかまたち"><div class="start-title"><h1>ANGLE HUNTER</h1><p>角度を見抜け。ナビアンをつかまえろ。</p></div></div><div class="mode-grid"><div class="mode"><span class="mode-mark">◈</span><b>ハンターモード</b><span class="mode-desc">角度のきざみを選んで、ナビアンをつかまえよう。</span><div class="step-select"><button class="step-btn" data-mode="hunter" data-step="30">30°</button><button class="step-btn" data-mode="hunter" data-step="15">15°</button><button class="step-btn" data-mode="hunter" data-step="1">1°</button></div></div><div class="mode"><span class="mode-mark">◆</span><b>チャレンジモード</b><span class="mode-desc">60秒で何体つかまえられる？角度のきざみを選んで挑戦しよう。</span><div class="step-select"><button class="step-btn" data-mode="challenge" data-step="30">30°</button><button class="step-btn" data-mode="challenge" data-step="15">15°</button><button class="step-btn" data-mode="challenge" data-step="1">1°</button></div></div><button class="mode book-mode" onclick="location.href='book.html'" data-mode="book"><span class="mode-mark">▣</span><b>ナビアン図鑑</b><span class="mode-desc">出会えるナビアンを一覧でチェック。</span></button></div><p class="start-note">30°・15°・1°から選ぼう　｜　見る → 考える → 角度を読む → つかまえる</p></div></div>
@@ -46,7 +48,7 @@ const NAMES=['どんぐりリーフ','オーロラシェルリザード','オー
 const $=id=>document.getElementById(id),C={cx:200,cy:200,r:155,navR:132};let step=30,mode='hunter',target=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0;
 function loadStats(){try{return JSON.parse(localStorage.getItem('angleHunter.stats.v2'))||{attempts:0,correct:0,weak:{}}}catch(e){return{attempts:0,correct:0,weak:{}}}}function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}function point(deg,r=C.navR){const a=-deg*Math.PI/180;return{x:C.cx+Math.cos(a)*r,y:C.cy+Math.sin(a)*r}}function sectorPath(deg,r=104){if(deg<=0)return `M ${C.cx} ${C.cy} L ${C.cx+r} ${C.cy} Z`;const a=-deg*Math.PI/180,x=C.cx+Math.cos(a)*r,y=C.cy+Math.sin(a)*r,large=deg>180?1:0;return `M ${C.cx} ${C.cy} L ${C.cx+r} ${C.cy} A ${r} ${r} 0 ${large} 0 ${x} ${y} Z`}function setSector(deg,strong=false){const e=$('angleSector');if(!e)return;e.setAttribute('d',sectorPath(deg));e.setAttribute('class',strong?'angle-sector active':'angle-sector')}
 function drawField(){let s='<svg viewBox="0 0 400 400" width="100%" height="100%" aria-hidden="true">';s+='<path id="angleSector" class="angle-sector" d="'+sectorPath(0)+'"/><circle cx="200" cy="200" r="155" fill="none" stroke="#24344f" stroke-width="2.5" opacity=".65"/>';for(let d=0;d<360;d+=step){const a=-d*Math.PI/180,major=d%30===0,r1=major?143:150,r2=160,x1=200+Math.cos(a)*r1,y1=200+Math.sin(a)*r1,x2=200+Math.cos(a)*r2,y2=200+Math.sin(a)*r2;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#24344f" stroke-width="${major?3.5:2}" opacity="${major?'.9':'.62'}" stroke-linecap="round"/>`;if(major)s+=`<text x="${200+Math.cos(a)*128}" y="${200+Math.sin(a)*128+5}" text-anchor="middle" font-size="13" font-weight="800" fill="#24344f">${d}°</text>`}s+='</svg>';$('field').innerHTML=s}
-function buildAngles(){const box=$('angles');box.innerHTML='';for(let d=0;d<360;d+=step){const b=document.createElement('button');b.type='button';b.className='angle';b.textContent=d+'°';const choose=ev=>{ev.preventDefault();answer(d,b)};b.addEventListener('pointerup',choose);box.appendChild(b)}}function setLine(el,deg,len=C.r){el.style.width=len+'px';el.style.transform=`rotate(${-deg}deg)`}function posNav(deg){const p=point(deg);$('navian').style.left=p.x/400*100+'%';$('navian').style.top=p.y/400*100+'%'}function resetLines(){['aim','correctLine','net'].forEach(id=>{const e=$(id);e.className=id;e.style.width='0';e.style.opacity='0'});setSector(0,false);$('message').className='message';$('message').textContent=''}function randomNav(){return NAVIANS[Math.floor(Math.random()*NAVIANS.length)]}
+function buildAngles(){const box=$('angles');box.innerHTML='';if(step===15){const s=document.createElement('select');s.className='angle-select';s.setAttribute('aria-label','答えの角度を選択');const first=document.createElement('option');first.value='';first.textContent='角度を選ぶ';first.disabled=true;first.selected=true;s.appendChild(first);for(let d=0;d<360;d+=15){const o=document.createElement('option');o.value=String(d);o.textContent=d+'°';s.appendChild(o)}s.addEventListener('change',ev=>{const d=Number(ev.target.value);answer(d,s)});box.appendChild(s);return}for(let d=0;d<360;d+=step){const b=document.createElement('button');b.type='button';b.className='angle';b.textContent=d+'°';const choose=ev=>{ev.preventDefault();answer(d,b)};b.addEventListener('pointerup',choose);box.appendChild(b)}}function setLine(el,deg,len=C.r){el.style.width=len+'px';el.style.transform=`rotate(${-deg}deg)`}function posNav(deg){const p=point(deg);$('navian').style.left=p.x/400*100+'%';$('navian').style.top=p.y/400*100+'%'}function resetLines(){['aim','correctLine','net'].forEach(id=>{const e=$(id);e.className=id;e.style.width='0';e.style.opacity='0'});setSector(0,false);$('message').className='message';$('message').textContent=''}function randomNav(){return NAVIANS[Math.floor(Math.random()*NAVIANS.length)]}
 function spawn(){cancelAnimationFrame(anim);anim=null;locked=false;resetLines();$('next').style.display='none';$('navian').className='navian';$('navian').src=NAV+randomNav();target=Math.floor(Math.random()*(360/step))*step;posNav(0);let duration=850+target*3.1;if(mode==='challenge')duration=420;$('navian').classList.add('running');$('aim').classList.add('show');setLine($('aim'),0,C.r);setSector(0,false);const t0=performance.now();function tick(t){const p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,2),deg=target*e;posNav(deg);setLine($('aim'),deg,C.r);setSector(deg,false);if(p<1)anim=requestAnimationFrame(tick);else{$('navian').classList.remove('running');posNav(target);setLine($('aim'),target,C.r);setSector(target,true);locked=true;anim=null}}anim=requestAnimationFrame(tick)}
 function feedback(text,kind){const m=$('message');m.textContent=text;m.className='message show '+kind}function answer(choice,button){if(!locked)return;locked=false;stats.attempts++;const ok=choice===target;if(ok){stats.correct++;score++;button.classList.add('correct');$('navian').classList.add('caught');setLine($('net'),choice,C.r);$('net').classList.add('right');setSector(target,true);feedback('GET！ '+target+'°','hit')}else{stats.weak[target]=(stats.weak[target]||0)+1;button.classList.add('wrong');setLine($('net'),choice,C.r);$('net').classList.add('wrong');setLine($('correctLine'),target,C.r);$('correctLine').classList.add('show');setSector(target,true);feedback('おしい！ 正解は '+target+'°','miss')}saveStats();renderStats();if(mode==='challenge'){setTimeout(()=>{if(timeLeft>0)spawn()},ok?260:1000)}else{$('next').style.display='inline-flex'}}
 function renderStats(){$('attempts').textContent=stats.attempts;$('correct').textContent=stats.correct;$('rate').textContent=stats.attempts?Math.round(stats.correct/stats.attempts*100)+'%':'0%';$('score').textContent=score;$('timer').textContent=timeLeft;$('stepLabel').textContent=step===1?'1°刻み':step+'°'}
@@ -71,33 +73,4 @@ document.addEventListener('click',function(e){
 },true);
 </script>
 
-<script id="compact-15-degree-script">
-(()=>{
-  const modes=[...document.querySelectorAll('.mode')];
-  const mode=modes.find(el=>/15\s*[°度]/.test(el.textContent));
-  if(!mode)return;
-  const wrap=mode.querySelector('.step-select');
-  if(!wrap||wrap.querySelector('select'))return;
-  const buttons=[...wrap.querySelectorAll('.step-btn')];
-  if(!buttons.length)return;
-  const box=document.createElement('div');
-  box.className='step-select-compact';
-  const select=document.createElement('select');
-  select.setAttribute('aria-label','15度モードの角度を選択');
-  buttons.forEach((btn,i)=>{
-    const opt=document.createElement('option');
-    opt.value=String(i);
-    opt.textContent=btn.textContent.trim();
-    if(btn.classList.contains('active'))opt.selected=true;
-    select.appendChild(opt);
-  });
-  select.addEventListener('change',()=>{
-    const btn=buttons[Number(select.value)];
-    if(btn)btn.click();
-  });
-  box.appendChild(select);
-  wrap.classList.add('compact-15-wrap');
-  wrap.appendChild(box);
-})();
-</script>
 </body></html>
