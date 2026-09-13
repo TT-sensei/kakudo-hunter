@@ -57,4 +57,12 @@ function spawnProtractor(){locked=false;$('protractorNext').style.display='none'
 function answerProtractor(){if(!locked)return;const input=$('degreeInput'),value=Number(input.value);if(!Number.isInteger(value)||value<0||value>180)return;locked=false;$('degreeSubmit').disabled=true;stats.attempts++;const ok=Math.abs(value-target)<=1;if(ok){stats.correct++;score++;input.classList.add('protractor-correct');$('protractorNavian').classList.add('caught');$('protractorCorrectLine').className='protractor-correct-line show';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro('ぴったり！ '+target+'°','hit')}else{stats.weak[target]=(stats.weak[target]||0)+1;input.classList.add('protractor-wrong');$('protractorCorrectLine').className='protractor-correct-line show';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro('正解は '+target+'°。目盛をもう一度確認しよう','miss')}saveStats();renderStats();if(mode==='challenge'){setTimeout(()=>{if(timeLeft>0)spawnProtractor()},ok?260:380)}else $('protractorNext').style.display='inline-flex'}function feedbackPro(text,kind){$('protractorLabel').textContent=text;$('protractorLabel').className='protractor-label '+kind}
 function title(){clearInterval(timerId);timerId=null;cancelAnimationFrame(anim);anim=null;locked=false;$('app').classList.add('hidden');$('result').classList.add('hidden');$('book').classList.add('hidden');$('start').classList.remove('hidden')}function openBook(){clearInterval(timerId);timerId=null;cancelAnimationFrame(anim);anim=null;locked=false;$('start').classList.add('hidden');$('app').classList.add('hidden');$('book').classList.remove('hidden');const g=$('bookGrid');g.innerHTML='';NAVIANS.forEach((f,i)=>{const c=document.createElement('div');c.className='book-card';c.innerHTML=`<img src="${NAV+f}" alt="${NAMES[i]}"><span>${NAMES[i]}</span>`;g.appendChild(c)})}
 document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();startGame(b.dataset.mode,b.dataset.step||30)}));$('next').onclick=spawn;$('protractorNext').onclick=spawnProtractor;$('titleBtn').onclick=title;$('resultTitle').onclick=title;$('again').onclick=()=>startGame('challenge',step);$('bookBack').onclick=title;$('degreeSubmit').onclick=answerProtractor;$('degreeInput').addEventListener('keydown',e=>{if(e.key==='Enter')answerProtractor()});renderStats();
-</script></body></html>
+</script>
+<script>
+// STANDALONE_BOOK_LINK
+document.addEventListener('click',function(e){
+  const b=e.target.closest('.book-mode');
+  if(b){e.preventDefault();e.stopImmediatePropagation();location.href='book.html';}
+},true);
+</script>
+</body></html>
