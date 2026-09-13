@@ -1,0 +1,37 @@
+name: Link standalone encyclopedia
+on:
+  push:
+    branches: [main]
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Link book.html from title screen
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          marker='// STANDALONE_BOOK_LINK'
+          if marker not in s:
+              patch='''\n<script>\n// STANDALONE_BOOK_LINK\ndocument.addEventListener('click',function(e){\n  const b=e.target.closest('.book-mode');\n  if(b){e.preventDefault();e.stopImmediatePropagation();location.href='book.html';}\n},true);\n</script>\n'''
+              s=s.replace('</body>',patch+'</body>',1)
+              p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Link title screen to standalone Navian encyclopedia"
+          git push
+      - name: Remove temporary workflow
+        if: success()
+        run: |
+          rm -f .github/workflows/link-standalone-book.yml
+          git add .github/workflows/link-standalone-book.yml
+          git diff --cached --quiet || git commit -m "Remove temporary book link workflow"
+          git push
