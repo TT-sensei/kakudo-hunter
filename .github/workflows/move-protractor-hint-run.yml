@@ -1,40 +1,43 @@
 name: Apply protractor hint layout fix
-on:
-  push:
-  workflow_dispatch:
+on: [push]
 permissions:
   contents: write
 jobs:
   fix:
-    if: github.event.head_commit.message != 'chore: remove temporary protractor hint workflow'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Move hint outside protractor
+        shell: bash
         run: |
           python - <<'PY'
           from pathlib import Path
           import re
-          p=Path('index.html'); s=p.read_text(encoding='utf-8')
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
           hints=re.findall(r'<(?:div|span) class="protractor-direction\s+(?:left|right)">.*?</(?:div|span)>',s,flags=re.S)
-          if len(hints)!=2: raise SystemExit(f'Expected 2 hints, found {len(hints)}')
+          if len(hints)!=2:
+              raise SystemExit(f'Expected 2 hints, found {len(hints)}')
           s=re.sub(r'<(?:div|span) class="protractor-direction\s+(?:left|right)">.*?</(?:div|span)>','',s,flags=re.S)
           marker='<div class="protractor-question">'
-          if marker not in s: raise SystemExit('protractor-question marker not found')
+          if marker not in s:
+              raise SystemExit('protractor-question marker not found')
           s=s.replace(marker,'<div class="protractor-hints">'+''.join(hints)+'</div>'+marker,1)
           old='.protractor-direction{position:absolute;bottom:5%;font-size:.7rem;color:var(--muted);font-weight:800;z-index:8}.protractor-direction.left{left:7%}.protractor-direction.right{right:7%}'
           new='.protractor-hints{grid-column:1;display:flex;align-items:center;justify-content:center;gap:18px;min-height:28px}.protractor-direction{position:static;font-size:.78rem;color:var(--muted);font-weight:800;z-index:8}'
-          if old not in s: raise SystemExit('old direction CSS not found')
+          if old not in s:
+              raise SystemExit('old direction CSS not found')
           s=s.replace(old,new,1)
           p.write_text(s,encoding='utf-8')
           PY
-      - name: Commit and remove temporary workflows
+      - name: Commit fix and remove temporary files
+        shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
           git diff --cached --quiet || git commit -m 'fix: move protractor reading hint below question'
           rm -f .github/workflows/move-protractor-hint.yml .github/workflows/move-protractor-hint-run.yml .github/workflows/trigger-protractor-hint-fix.txt
-          git add .github/workflows/move-protractor-hint.yml .github/workflows/move-protractor-hint-run.yml .github/workflows/trigger-protractor-hint-fix.txt
+          git add -A .github/workflows
           git diff --cached --quiet || git commit -m 'chore: remove temporary protractor hint workflows'
           git push
