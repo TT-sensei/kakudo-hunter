@@ -1,0 +1,38 @@
+name: Compact 15 degree selector
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Replace 15 degree choices with a select
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          css='''\n<style id="compact-15-degree-select">\n.step-select-compact{display:block;margin-top:12px}.step-select-compact select{width:100%;min-height:48px;padding:8px 42px 8px 14px;border:2px solid var(--line);border-radius:12px;background:#f8fafc;color:var(--navy);font:inherit;font-size:1rem;font-weight:900;cursor:pointer}.step-select-compact select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}\n.step-select-compact .step-btn{display:none!important}\n</style>\n'''
+          if 'compact-15-degree-select' not in s:
+              s=s.replace('</head>',css+'</head>',1)
+          js='''\n<script id="compact-15-degree-script">\n(()=>{\n  const modes=[...document.querySelectorAll('.mode')];\n  const mode=modes.find(el=>/15\\s*[°度]/.test(el.textContent));\n  if(!mode)return;\n  const wrap=mode.querySelector('.step-select');\n  if(!wrap||wrap.querySelector('select'))return;\n  const buttons=[...wrap.querySelectorAll('.step-btn')];\n  if(!buttons.length)return;\n  const box=document.createElement('div');\n  box.className='step-select-compact';\n  const select=document.createElement('select');\n  select.setAttribute('aria-label','15度モードの角度を選択');\n  buttons.forEach((btn,i)=>{\n    const opt=document.createElement('option');\n    opt.value=String(i);\n    opt.textContent=btn.textContent.trim();\n    if(btn.classList.contains('active'))opt.selected=true;\n    select.appendChild(opt);\n  });\n  select.addEventListener('change',()=>{\n    const btn=buttons[Number(select.value)];\n    if(btn)btn.click();\n  });\n  box.appendChild(select);\n  wrap.classList.add('compact-15-wrap');\n  wrap.appendChild(box);\n})();\n</script>\n'''
+          if 'compact-15-degree-script' not in s:
+              s=s.replace('</body>',js+'</body>',1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove workflow
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "fix: compact 15 degree mode choices" || true
+          git rm .github/workflows/compact-15-degree-select.yml
+          git commit -m "chore: remove temporary selector workflow"
+          git push
