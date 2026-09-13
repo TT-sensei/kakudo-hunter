@@ -1,4 +1,4 @@
-name: Fix book display
+name: Patch Navian collection tracking
 
 on:
   push:
@@ -8,63 +8,42 @@ permissions:
   contents: write
 
 jobs:
-  fix:
+  patch:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Patch encyclopedia rendering
+      - name: Patch collection tracking
         run: |
           python - <<'PY'
           from pathlib import Path
           p=Path('index.html')
           s=p.read_text(encoding='utf-8')
-          marker='</script>'
-          patch="""
-// Encyclopedia fallback: render independently of the game state.
-function renderBook(){
-  const grid=document.getElementById('bookGrid');
-  if(!grid)return;
-  grid.innerHTML='';
-  NAVIANS.forEach((file,i)=>{
-    const card=document.createElement('div');
-    card.className='book-card';
-    const img=document.createElement('img');
-    img.src=NAV+file;
-    img.alt=NAMES[i]||'ナビアン';
-    img.loading='lazy';
-    const name=document.createElement('span');
-    name.textContent=NAMES[i]||'ナビアン';
-    card.appendChild(img);
-    card.appendChild(name);
-    grid.appendChild(card);
-  });
-}
-const bookModeButton=document.querySelector('.book-mode');
-if(bookModeButton)bookModeButton.addEventListener('click',()=>{
-  document.getElementById('start').classList.add('hidden');
-  document.getElementById('app').classList.add('hidden');
-  document.getElementById('result').classList.add('hidden');
-  const book=document.getElementById('book');
-  book.classList.remove('hidden');
-  renderBook();
-});
-const bookBackButton=document.getElementById('bookBack');
-if(bookBackButton)bookBackButton.addEventListener('click',()=>{
-  document.getElementById('book').classList.add('hidden');
-  document.getElementById('start').classList.remove('hidden');
-});
-"""
-          if 'function renderBook(){' not in s:
-              s=s.replace(marker,patch+'\n'+marker,1)
+          old="let mode='hunter',step=30,target=0,pos=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0;"
+          if old in s and 'currentNavian=' not in s:
+              s=s.replace(old,"let mode='hunter',step=30,target=0,pos=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0,currentNavian='';",1)
+          old="function randomNav(){return NAVIANS[Math.floor(Math.random()*NAVIANS.length)]}"
+          if old in s:
+              s=s.replace(old,"function randomNav(){currentNavian=NAVIANS[Math.floor(Math.random()*NAVIANS.length)];return currentNavian}",1)
+          marker="function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}"
+          if 'function recordNavianGet()' not in s:
+              if marker not in s: raise SystemExit('saveStats marker not found')
+              helper="function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}function recordNavianGet(){if(!currentNavian)return;try{const key='angleHunter.navianGets.v1';const gets=JSON.parse(localStorage.getItem(key))||{};gets[currentNavian]=(Number(gets[currentNavian])||0)+1;localStorage.setItem(key,JSON.stringify(gets))}catch(e){}}"
+              s=s.replace(marker,helper,1)
+          old="if(ok){stats.correct++;score++;button.classList.add('correct');"
+          if old in s and 'recordNavianGet();button.classList.add' not in s:
+              s=s.replace(old,"if(ok){stats.correct++;score++;recordNavianGet();button.classList.add('correct');",1)
+          old="if(ok){stats.correct++;score++;input.classList.add('protractor-correct');"
+          if old in s and 'recordNavianGet();input.classList.add' not in s:
+              s=s.replace(old,"if(ok){stats.correct++;score++;recordNavianGet();input.classList.add('protractor-correct');",1)
           p.write_text(s,encoding='utf-8')
           PY
-      - name: Commit and remove workflow
+      - name: Commit and remove temporary workflow
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add index.html
-          git commit -m "fix: render encyclopedia independently" || true
-          git rm .github/workflows/fix-book-display.yml
-          git commit -m "chore: remove temporary book workflow"
+          git commit -m "feat: track Navian captures" || true
+          git rm .github/workflows/fix-book-display.yml || true
+          git commit -m "chore: remove temporary collection workflow" || true
           git push
