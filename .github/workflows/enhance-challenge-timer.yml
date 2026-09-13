@@ -1,0 +1,37 @@
+name: Enhance challenge timer
+on:
+  push:
+    paths:
+      - '.github/workflows/trigger-challenge-timer.txt'
+permissions:
+  contents: write
+jobs:
+  enhance:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Update challenge countdown UI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          # Make the existing challenge timer visually prominent.
+          s=s.replace('.challenge-timer{font-size:1.7rem!important;color:var(--red)!important}', '.challenge-timer{font-size:2.15rem!important;color:var(--red)!important;min-width:76px;text-align:center;line-height:1;letter-spacing:.03em}.challenge-timer.urgent{animation:timerPulse .55s ease-in-out infinite alternate}@keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.12)}}')
+          # Add an urgent state during the final 10 seconds and ensure 0 is rendered before ending.
+          old="if(mode==='challenge')timerId=setInterval(()=>{timeLeft--;renderStats();if(timeLeft<=0){clearInterval(timerId);timerId=null;finishChallenge()}},1000);"
+          new="if(mode==='challenge'){renderStats();timerId=setInterval(()=>{timeLeft--;renderStats();const timerEl=$('timer');if(timerEl)timerEl.classList.toggle('urgent',timeLeft<=10&&timeLeft>0);if(timeLeft<=0){clearInterval(timerId);timerId=null;if(timerEl){timerEl.textContent='0';timerEl.classList.remove('urgent')}finishChallenge()}},1000);}"
+          if old not in s:
+              raise SystemExit('challenge timer block not found')
+          s=s.replace(old,new,1)
+          # Reset urgent state whenever a challenge starts.
+          s=s.replace("timeLeft=60;score=0;renderStats();drawField();buildAngles();", "timeLeft=60;score=0;$('timer').classList.remove('urgent');renderStats();drawField();buildAngles();", 1)
+          p.write_text(s,encoding='utf-8')
+          PY
+          rm -f .github/workflows/trigger-challenge-timer.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows
+          git commit -m 'Enhance challenge countdown timer' || exit 0
+          git push
