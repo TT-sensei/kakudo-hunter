@@ -1,0 +1,46 @@
+name: Cleanup protractor label
+on:
+  push:
+    paths:
+      - '.github/workflows/cleanup-protractor-trigger.txt'
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Move and clean protractor label
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          # Remove any accidental hint blocks and their 0/180-side labels.
+          s=re.sub(r'<div class="protractor-hints">.*?</div>', '', s, flags=re.S)
+          s=re.sub(r'<div class="protractor-direction">.*?</div>', '', s, flags=re.S)
+          # Keep exactly one instructional label, outside the protractor card.
+          label=re.search(r'<div class="protractor-label" id="protractorLabel">.*?</div>', s, flags=re.S)
+          if not label:
+              raise SystemExit('protractorLabel not found')
+          label_html=label.group(0)
+          s=s[:label.start()]+s[label.end():]
+          # Remove accidental standalone 0/180-side text if present.
+          s=re.sub(r'(?:0側|180側)', '', s)
+          # Insert the label between the protractor card and the answer area.
+          marker='<div class="protractor-question">'
+          if marker not in s:
+              raise SystemExit('protractor-question not found')
+          s=s.replace(marker, label_html+marker, 1)
+          # Make the label a normal grid item, never an overlay on the protractor.
+          s=re.sub(r'\.protractor-label\{[^}]*\}', '.protractor-label{grid-column:1;position:static;justify-self:center;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap;margin:0 0 4px}', s, count=1)
+          p.write_text(s, encoding='utf-8')
+          PY
+          rm -f .github/workflows/cleanup-protractor-trigger.txt
+          rm -f .github/workflows/move-protractor-hint-run.yml .github/workflows/trigger-protractor-hint-fix.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows
+          git commit -m 'Clean up protractor hint display' || exit 0
+          git push
