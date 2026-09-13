@@ -1,0 +1,51 @@
+name: Add Navian collection tracking
+on:
+  push:
+    paths:
+      - '.github/workflows/trigger-navian-collection.txt'
+permissions:
+  contents: write
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch collection tracking
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="let mode='hunter',step=30,target=0,pos=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0;"
+          new="let mode='hunter',step=30,target=0,pos=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0,currentNavian='';"
+          if old not in s and 'currentNavian=' not in s:
+              s=s.replace("let mode='hunter',step=30,target=0,pos=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0;",new,1)
+          old="function randomNav(){return NAVIANS[Math.floor(Math.random()*NAVIANS.length)]}"
+          new="function randomNav(){currentNavian=NAVIANS[Math.floor(Math.random()*NAVIANS.length)];return currentNavian}"
+          if old in s:
+              s=s.replace(old,new,1)
+          elif 'function randomNav(){currentNavian=' not in s:
+              raise SystemExit('randomNav not found')
+          marker="function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}"
+          helper="function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}function recordNavianGet(){if(!currentNavian)return;try{const key='angleHunter.navianGets.v1';const gets=JSON.parse(localStorage.getItem(key))||{};gets[currentNavian]=(Number(gets[currentNavian])||0)+1;localStorage.setItem(key,JSON.stringify(gets))}catch(e){}}"
+          if 'function recordNavianGet()' not in s:
+              if marker not in s: raise SystemExit('saveStats marker not found')
+              s=s.replace(marker,helper,1)
+          target="if(ok){stats.correct++;score++;button.classList.add('correct');"
+          repl="if(ok){stats.correct++;score++;recordNavianGet();button.classList.add('correct');"
+          if target in s:
+              s=s.replace(target,repl,1)
+          else: raise SystemExit('normal correct block not found')
+          target="if(ok){stats.correct++;score++;input.classList.add('protractor-correct');"
+          repl="if(ok){stats.correct++;score++;recordNavianGet();input.classList.add('protractor-correct');"
+          if target in s:
+              s=s.replace(target,repl,1)
+          else: raise SystemExit('protractor correct block not found')
+          p.write_text(s,encoding='utf-8')
+          PY
+          rm -f .github/workflows/trigger-navian-collection.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html .github/workflows/trigger-navian-collection.txt
+          git commit -m 'Track Navian captures' || exit 0
+          git push
