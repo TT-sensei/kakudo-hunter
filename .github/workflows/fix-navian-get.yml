@@ -1,0 +1,46 @@
+name: Fix Navian capture tracking
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Patch capture tracking
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('index.html')
+          s=p.read_text(encoding='utf-8')
+          old="function recordNavianGet(){if(!currentNavian)return;try{const key='angleHunter.navianGets.v1';const gets=JSON.parse(localStorage.getItem(key))||{};gets[currentNavian]=(Number(gets[currentNavian])||0)+1;localStorage.setItem(key,JSON.stringify(gets))}catch(e){}}"
+          new="function recordNavianGet(src){try{const key='angleHunter.navianGets.v1';const gets=JSON.parse(localStorage.getItem(key))||{};const file=(src||'').split('/').pop();if(!file)return;gets[file]=(Number(gets[file])||0)+1;localStorage.setItem(key,JSON.stringify(gets))}catch(e){}}"
+          if old not in s: raise SystemExit('recordNavianGet function not found')
+          s=s.replace(old,new,1)
+          old="recordNavianGet();button.classList.add('correct');"
+          new="recordNavianGet($('navian').src);button.classList.add('correct');"
+          if old not in s: raise SystemExit('normal capture call not found')
+          s=s.replace(old,new,1)
+          old="recordNavianGet();input.classList.add('protractor-correct');"
+          new="recordNavianGet($('protractorNavian').src);input.classList.add('protractor-correct');"
+          if old not in s: raise SystemExit('protractor capture call not found')
+          s=s.replace(old,new,1)
+          old="let step=30,mode='hunter',target=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0;"
+          new="let step=30,mode='hunter',target=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0,currentNavian='';"
+          if old in s: s=s.replace(old,new,1)
+          p.write_text(s,encoding='utf-8')
+          PY
+      - name: Commit and remove temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html
+          git diff --cached --quiet || git commit -m 'fix: make Navian capture tracking robust'
+          rm -f .github/workflows/fix-navian-get.yml
+          git add -A .github/workflows
+          git diff --cached --quiet || git commit -m 'chore: remove temporary Navian tracking workflow'
+          git push
