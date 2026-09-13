@@ -1,6 +1,7 @@
 name: repair wrong advance
 on:
-  workflow_dispatch:
+  push:
+    branches: [main]
 jobs:
   repair:
     runs-on: ubuntu-latest
@@ -26,10 +27,12 @@ jobs:
           s = s.replace(old, new, 1)
           p.write_text(s)
           PY
-      - name: Commit
+      - name: Commit and remove workflow
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git commit -m 'fix auto advance after wrong answers' || exit 0
+          git commit -m 'fix auto advance after wrong answers' || true
+          git rm .github/workflows/repair-wrong-advance.yml
+          git commit -m 'chore remove repair workflow'
           git push
