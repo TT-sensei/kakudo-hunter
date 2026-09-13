@@ -1,5 +1,7 @@
 name: repair protractor
 on: push
+permissions:
+  contents: write
 jobs:
   repair:
     if: github.actor != 'github-actions[bot]'
@@ -29,9 +31,18 @@ jobs:
           s=s[:i]+new_answer+s[j:]
           p.write_text(s,encoding='utf-8')
           PY
-      - name: upload patched index
-        uses: actions/upload-artifact@v4
-        with:
-          name: patched-index
-          path: index.html
-          if-no-files-found: error
+      - name: commit fix
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add index.html
+          git diff --cached --quiet || git commit -m 'fix protractor direction progression and angle arc'
+          git push
+      - name: remove temporary workflow
+        if: success()
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git rm .github/workflows/repair-protractor.yml
+          git commit -m 'chore remove temporary repair workflow'
+          git push
