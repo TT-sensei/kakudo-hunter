@@ -1,1 +1,1 @@
-apply tablet answer layout
+apply tablet answer layout v2
