@@ -21,11 +21,57 @@ jobs:
           p = Path('angle-hunter.html')
           s = p.read_text(encoding='utf-8')
 
-          # タブレットは常に横2カラム。ズームでCSS幅が700px未満になっても縦積みにしない。
+          # タブレット横向き専用。画面幅やブラウザズームで縦積みにしない。
           s = re.sub(r'\n  @media \(max-width: 700px\) \{.*?\n  \}\n</style>', '\n</style>', s, flags=re.S)
 
-          # 答えボタンと次ボタンを右側サイドバーへ固定配置。
-          if 'sidebar.appendChild(angleButtonsEl)' not in s:
+          # 既存CSSの最後に、レイアウトを固定する上書きを入れる。
+          override = '''
+
+  /* ===== タブレット横向き：固定レイアウト ===== */
+  main {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr) !important;
+    gap: 18px !important;
+    min-height: 0 !important;
+  }
+  .field-wrap {
+    min-width: 0 !important;
+    min-height: 0 !important;
+  }
+  /* 分度器は横幅ではなく「画面の高さ」を基準にする。ズーム時の極端な縮小を防ぐ。 */
+  #fieldSvg {
+    width: min(50vh, 500px) !important;
+    height: min(50vh, 500px) !important;
+    max-width: none !important;
+    max-height: none !important;
+    flex: 0 0 auto !important;
+  }
+  .stat-sidebar {
+    min-width: 0 !important;
+    max-width: none !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  #angleButtons {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(44px, 1fr)) !important;
+    grid-auto-flow: row !important;
+    align-content: start !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+  #nextBtn {
+    flex: 0 0 auto !important;
+  }
+'''
+          if '/* ===== タブレット横向き：固定レイアウト ===== */' not in s:
+              s = s.replace('</style>', override + '\n</style>')
+
+          # 答えボタンと次ボタンは必ず右側サイドバー内へ。
+          if 'sidebar.appendChild(angleButtonsEl);' not in s:
               s = s.replace('''    buildAngleButtons();\n    updateStatsPanel();''', '''    buildAngleButtons();\n    const sidebar = document.querySelector('.stat-sidebar');\n    sidebar.appendChild(angleButtonsEl);\n    sidebar.appendChild(nextBtn);\n    updateStatsPanel();''')
 
           p.write_text(s, encoding='utf-8')
@@ -33,5 +79,5 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add angle-hunter.html
-          git diff --cached --quiet || git commit -m 'Fix fixed landscape tablet layout'
+          git diff --cached --quiet || git commit -m 'Fix fixed landscape layout and protractor size'
           git push
