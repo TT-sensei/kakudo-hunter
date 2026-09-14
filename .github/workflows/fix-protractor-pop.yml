@@ -1,46 +1,94 @@
 name: Fix protractor pop position
 on:
   push:
+    branches: [main]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   fix:
-    if: github.event.head_commit.message != 'chore: remove temporary protractor pop workflow'
+    if: github.event.head_commit.message != 'chore: apply tablet answer layout'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Move actual protractor label above answer area
+      - name: Apply tablet landscape answer layout
         run: |
           python - <<'PY'
           from pathlib import Path
-          import re
-          p=Path('index.html')
-          s=p.read_text(encoding='utf-8')
-          pattern=r'<div class="protractor-label" id="protractorLabel">.*?</div>'
-          m=re.search(pattern,s,flags=re.S)
-          if not m:
-              raise SystemExit('protractorLabel not found')
-          label=m.group(0)
-          s=s[:m.start()]+s[m.end():]
-          marker='<div class="protractor-question">'
-          if marker not in s:
-              raise SystemExit('protractor-question not found')
-          s=s.replace(marker,label+marker,1)
-          old='.protractor-label{position:absolute;left:50%;top:9%;transform:translateX(-50%);z-index:10;padding:7px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap}'
-          new='.protractor-label{grid-column:1;position:static;justify-self:center;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap;margin:0 0 4px}'
-          if old not in s:
-              raise SystemExit('old protractor-label CSS not found')
-          s=s.replace(old,new,1)
-          p.write_text(s,encoding='utf-8')
+          p = Path('index.html')
+          s = p.read_text(encoding='utf-8')
+          marker = '/* TABLET_ANSWER_LAYOUT_FINAL */'
+          if marker in s:
+              raise SystemExit('tablet layout already applied')
+          css = r'''/* TABLET_ANSWER_LAYOUT_FINAL */
+          @media (pointer: coarse) and (orientation: landscape) and (min-width: 900px) {
+            #normalGame.game {
+              grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
+              grid-template-rows: minmax(0, 1fr) auto auto;
+              column-gap: 18px;
+              row-gap: 10px;
+            }
+            #normalGame .arena-wrap {
+              grid-column: 1;
+              grid-row: 1 / 4;
+              min-width: 0;
+              min-height: 0;
+              padding: 12px;
+            }
+            #normalGame .arena {
+              width: min(78vh, calc(100vw - 440px), 700px);
+              height: min(78vh, calc(100vw - 440px), 700px);
+              min-width: 420px;
+              min-height: 420px;
+            }
+            #normalGame .side {
+              grid-column: 2;
+              grid-row: 1;
+              align-self: start;
+              width: 100%;
+            }
+            #normalGame #angles {
+              grid-column: 2;
+              grid-row: 2;
+              grid-template-columns: repeat(3, minmax(0, 1fr));
+              gap: 10px;
+              width: 100%;
+              align-self: center;
+            }
+            #normalGame .angle {
+              min-height: 64px;
+              font-size: 1.12rem;
+            }
+            #normalGame #angles .angle-select {
+              grid-column: 1 / -1;
+              width: 100%;
+              min-height: 64px;
+              font-size: 1.15rem;
+              border: 2px solid var(--line);
+              border-radius: 14px;
+              padding: 0 14px;
+              background: #fff;
+              color: var(--navy);
+              font-weight: 800;
+            }
+            #normalGame #next {
+              grid-column: 2;
+              grid-row: 3;
+              width: 100%;
+              min-height: 56px;
+              justify-self: stretch;
+            }
+          }
+          '''
+          pos = s.rfind('</style>')
+          if pos < 0:
+              raise SystemExit('style closing tag not found')
+          p.write_text(s[:pos] + css + '\n' + s[pos:], encoding='utf-8')
           PY
-      - name: Commit and remove temporary workflows
+      - name: Commit layout
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'fix: move protractor reading pop above answer input'
-          rm -f .github/workflows/fix-protractor-pop.yml .github/workflows/move-protractor-hint-run.yml .github/workflows/trigger-protractor-hint-fix.txt
-          git add -A .github/workflows
-          git diff --cached --quiet || git commit -m 'chore: remove temporary protractor pop workflow'
+          git diff --cached --quiet || git commit -m 'chore: apply tablet answer layout'
           git push
