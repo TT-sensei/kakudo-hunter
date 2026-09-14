@@ -1,0 +1,55 @@
+name: Apply tablet answer layout
+
+on:
+  push:
+    paths:
+      - '.github/workflows/trigger-tablet-answer-layout.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply layout changes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('angle-hunter.html')
+          s = p.read_text(encoding='utf-8')
+
+          s = s.replace('''  .title-block p {\n    margin: 2px 0 0; font-size: 0.72rem; color: var(--ink-dim);\n  }''', '''  .title-block p {\n    display: none;\n  }''')
+
+          s = s.replace('''  main {\n    flex: 1;\n    display: flex;\n    gap: 14px;\n    min-height: 0;\n  }''', '''  main {\n    flex: 1;\n    display: grid;\n    grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);\n    gap: 18px;\n    min-height: 0;\n  }''')
+
+          s = s.replace('''  .field-wrap {\n    position: relative;\n    flex: 1.3;\n    display: flex; align-items: center; justify-content: center;\n    min-width: 0;\n  }''', '''  .field-wrap {\n    position: relative;\n    display: flex; align-items: center; justify-content: center;\n    min-width: 0;\n    min-height: 0;\n  }''')
+
+          s = s.replace('''  .stat-sidebar {\n    flex: 0.7;\n    display: flex; flex-direction: column; gap: 10px;\n    min-width: 140px; max-width: 220px;\n  }''', '''  .stat-sidebar {\n    display: flex; flex-direction: column; gap: 10px;\n    min-width: 0; max-width: none;\n    min-height: 0;\n  }''')
+
+          s = s.replace('''  #angleButtons {\n    flex-shrink: 0;\n    display: grid;\n    grid-auto-flow: column;\n    grid-template-rows: repeat(2, 1fr);\n    gap: 8px;\n    padding: 10px 2px 4px;\n    overflow-x: auto;\n  }''', '''  #angleButtons {\n    flex: 1;\n    min-height: 0;\n    display: grid;\n    grid-template-columns: repeat(6, minmax(48px, 1fr));\n    grid-auto-flow: row;\n    align-content: start;\n    gap: 8px;\n    padding: 2px;\n    overflow-y: auto;\n    overflow-x: hidden;\n  }''')
+
+          s = s.replace('''    min-width: 58px;\n    padding: 12px 6px;\n    font-size: 0.95rem;''', '''    min-width: 0;\n    min-height: 54px;\n    padding: 10px 4px;\n    font-size: 0.95rem;''')
+
+          s = s.replace('''  #nextBtn {\n    display:none;''', '''  #nextBtn {\n    display:none;''')
+
+          marker = '''    // 角度選択ボタン'''
+          insert = '''    // タブレットでは「問題：左」「記録＋答え：右」にまとめる\n    if (window.matchMedia('(min-width: 701px)').matches) {\n      const sidebar = document.querySelector('.stat-sidebar');\n      sidebar.appendChild(angleButtonsEl);\n      sidebar.appendChild(nextBtn);\n    }\n\n'''
+          if insert not in s:
+              s = s.replace(marker, insert + marker)
+
+          s = s.replace('''  @media (max-width: 700px) {\n    main { flex-direction: column; }\n    .stat-sidebar { flex-direction: row; flex-wrap: wrap; max-width: none; }\n    .stat-sidebar .panel { flex: 1; min-width: 130px; }\n    .field-wrap { flex: none; height: 46vh; }\n  }''', '''  @media (max-width: 700px) {\n    main { display: flex; flex-direction: column; }\n    .stat-sidebar { flex-direction: row; flex-wrap: wrap; max-width: none; }\n    .stat-sidebar .panel { flex: 1; min-width: 130px; }\n    .field-wrap { flex: none; height: 46vh; }\n    #angleButtons {\n      flex-shrink: 0;\n      display: grid;\n      grid-auto-flow: column;\n      grid-template-rows: repeat(2, 1fr);\n      grid-template-columns: none;\n      gap: 8px;\n      padding: 10px 2px 4px;\n      overflow-x: auto;\n      overflow-y: hidden;\n    }\n  }''')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+
+      - name: Commit changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add angle-hunter.html
+          git diff --cached --quiet || git commit -m 'Improve tablet answer layout'
+          git push
