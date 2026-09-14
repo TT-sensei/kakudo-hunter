@@ -34,6 +34,103 @@
 #angles .angle-select{width:100%;min-height:54px;padding:8px 46px 8px 16px;border:2px solid var(--line);border-radius:13px;background:#fff;color:var(--navy);font:inherit;font-size:1.05rem;font-weight:900;box-shadow:0 3px 8px rgba(24,42,67,.06);cursor:pointer;touch-action:manipulation}
 #angles .angle-select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}
 @media(max-width:1050px){#angles .angle-select{min-height:54px;font-size:1rem}}
+
+/* Tablet landscape: keep the problem large and move answer controls to the right. */
+@media (pointer: coarse) and (orientation: landscape) and (min-width: 900px) {
+  .game {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    grid-template-rows: minmax(0, 1fr) auto auto;
+    gap: 10px 18px;
+  }
+
+  .arena-wrap {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    min-width: 0;
+    min-height: 0;
+    padding: 18px;
+  }
+
+  .arena {
+    width: min(76vh, calc(100vw - 420px), 680px);
+    height: min(76vh, calc(100vw - 420px), 680px);
+    min-width: 400px;
+    min-height: 400px;
+  }
+
+  .side {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: start;
+  }
+
+  #angles {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    align-self: center;
+  }
+
+  .angle {
+    min-height: 64px;
+    font-size: 1.08rem;
+  }
+
+  #next,
+  #protractorNext {
+    grid-column: 2;
+    grid-row: 3;
+    justify-self: stretch;
+    width: 100%;
+    min-height: 54px;
+  }
+
+  #protractorView {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+    min-width: 0;
+    min-height: 0;
+    padding: 10px 18px;
+  }
+
+  .protractor-card {
+    width: min(96%, 860px);
+  }
+
+  .protractor-question {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: center;
+    justify-self: stretch;
+    flex-wrap: nowrap;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: 0 4px 14px rgba(24,42,67,.06);
+  }
+
+  .degree-input {
+    width: 120px;
+    height: 58px;
+    font-size: 1.65rem;
+  }
+
+  .degree-submit {
+    min-height: 58px;
+    padding: 10px 22px;
+  }
+
+  .protractor-help {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    justify-self: center;
+    transform: translateY(58px);
+  }
+}
+
 </style>
 </head><body>
 <div id="start" class="deco-fantasy"><div class="start-card"><div class="start-head"><img class="town-group" src="https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/groups/group-fantasy-town.png" alt="ナビアンのなかまたち"><div class="start-title"><h1>ANGLE HUNTER</h1><p>角度を見抜け。ナビアンをつかまえろ。</p></div></div><div class="mode-grid"><div class="mode"><span class="mode-mark">◈</span><b>ハンターモード</b><span class="mode-desc">角度のきざみを選んで、ナビアンをつかまえよう。</span><div class="step-select"><button class="step-btn" data-mode="hunter" data-step="30">30°</button><button class="step-btn" data-mode="hunter" data-step="15">15°</button><button class="step-btn" data-mode="hunter" data-step="1">1°</button></div></div><div class="mode"><span class="mode-mark">◆</span><b>チャレンジモード</b><span class="mode-desc">60秒で何体つかまえられる？角度のきざみを選んで挑戦しよう。</span><div class="step-select"><button class="step-btn" data-mode="challenge" data-step="30">30°</button><button class="step-btn" data-mode="challenge" data-step="15">15°</button><button class="step-btn" data-mode="challenge" data-step="1">1°</button></div></div><button class="mode book-mode" onclick="location.href='book.html'" data-mode="book"><span class="mode-mark">▣</span><b>ナビアン図鑑</b><span class="mode-desc">出会えるナビアンを一覧でチェック。</span></button></div><p class="start-note">30°・15°・1°から選ぼう　｜　見る → 考える → 角度を読む → つかまえる</p></div></div>
