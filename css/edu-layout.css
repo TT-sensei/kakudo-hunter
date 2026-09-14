@@ -35,3 +35,73 @@
 #protractorGame .protractor-question{padding:12px}
 }
 @media (orientation:landscape){#normalGame.game{grid-template-columns:minmax(0,1fr) 330px}}
+
+/* Phone portrait: keep the same controls, only stack the layout vertically. */
+@media (max-width:700px) and (orientation:portrait){
+  #normalGame.game{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto auto auto;
+    gap:10px;
+  }
+  #normalGame .arena-wrap{
+    grid-column:1;
+    grid-row:1;
+    padding:6px;
+  }
+  #normalGame .arena{
+    width:min(88vw,52vh,430px);
+    height:min(88vw,52vh,430px);
+    margin:0 auto;
+  }
+  #normalGame .side{
+    display:contents;
+  }
+  #normalGame .side .panel:first-child{
+    grid-column:1;
+    grid-row:2;
+  }
+  #normalGame #challengePanel{
+    grid-column:1;
+    grid-row:3;
+  }
+  #normalGame #angles{
+    grid-column:1;
+    grid-row:4;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:7px;
+  }
+  #normalGame #next{
+    grid-column:1;
+    grid-row:5;
+  }
+}
+
+/* Phone portrait protractor: same controls, stacked vertically. */
+@media (max-width:700px) and (orientation:portrait){
+  #protractorGame #protractorView{
+    grid-template-columns:minmax(0,1fr);
+    grid-template-rows:auto auto auto auto;
+    gap:10px;
+    padding:8px;
+  }
+  #protractorGame .protractor-card{
+    grid-column:1;
+    grid-row:1;
+    width:min(100%,430px);
+    justify-self:center;
+  }
+  #protractorGame .protractor-label{
+    grid-column:1;
+    grid-row:2;
+    align-self:start;
+  }
+  #protractorGame .protractor-question{
+    grid-column:1;
+    grid-row:3;
+    padding:12px;
+  }
+  #protractorGame #protractorNext{
+    grid-column:1;
+    grid-row:4;
+  }
+}
