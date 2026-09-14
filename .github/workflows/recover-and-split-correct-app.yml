@@ -13,15 +13,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Restore pre-refactor entry and split it safely
+      - name: Restore known-good entry and split it safely
         shell: python
         run: |
           import subprocess
           from pathlib import Path
           import re
 
-          # The commit immediately before our split attempt is the known-good tree.
           good = 'f9942b401c43aa1e2cc680c513e126894b1e5415'
           subprocess.run(['git', 'checkout', good, '--', 'index.html', 'angle-hunter.html'], check=True)
 
@@ -36,14 +37,12 @@ jobs:
           Path('css/style.css').write_text('\n\n'.join(s.strip() for s in styles) + '\n', encoding='utf-8')
           Path('js/app.js').write_text('\n\n'.join(s.strip() for s in scripts) + '\n', encoding='utf-8')
 
-          # Remove only the inline CSS and inline JS. Keep HTML structure, IDs, assets and logic intact.
           html = re.sub(r'<style(?:\s+[^>]*)?>.*?</style>', '', text, flags=re.S)
           html = re.sub(r'<script>.*?</script>', '', html, flags=re.S)
           html = html.replace('</head>', '  <link rel="stylesheet" href="css/style.css">\n</head>', 1)
           html = html.replace('</body>', '  <script src="js/app.js"></script>\n</body>', 1)
           Path('index.html').write_text(html, encoding='utf-8')
 
-          # Remove temporary artifacts created by the failed first attempt.
           legacy = Path('legacy/angle-hunter-before-split.html')
           if legacy.exists():
               legacy.unlink()
