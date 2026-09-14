@@ -1,62 +1,32 @@
 /* edu-kit learning layout: tablet landscape / one-screen */
-#normalGame.game{
-  grid-template-columns:minmax(0,1fr) 330px;
-  grid-template-rows:auto auto minmax(0,1fr) auto;
-  gap:10px 14px;
-}
-#normalGame .arena-wrap{
-  grid-column:1;
-  grid-row:1 / 5;
-  min-height:0;
-}
-#normalGame .arena{
-  width:min(72vh,calc(100vw - 390px),650px);
-  height:min(72vh,calc(100vw - 390px),650px);
-}
-#normalGame .side{
-  display:contents;
-}
-#normalGame .side .panel:first-child{
-  grid-column:2;
-  grid-row:1;
-}
-#normalGame #challengePanel{
-  grid-column:2;
-  grid-row:2;
-}
-#normalGame #angles{
-  grid-column:2;
-  grid-row:3;
-  display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
-  align-content:start;
-  gap:8px;
-  min-height:0;
-  overflow:auto;
-  padding:2px;
-}
-#normalGame .angle{
-  min-height:52px;
-}
-#normalGame #next{
-  grid-column:2;
-  grid-row:4;
-  width:100%;
-}
-#normalGame .message{
-  top:5%;
-}
-
-/* The learning field stays primary; the answer area is a separate right-hand workspace. */
-#normalGame .arena-wrap{padding:10px}
+#normalGame.game{grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px 14px}
+#normalGame .arena-wrap{grid-column:1;grid-row:1 / 5;min-height:0;padding:10px}
+#normalGame .arena{width:min(72vh,calc(100vw - 390px),650px);height:min(72vh,calc(100vw - 390px),650px)}
+#normalGame .side{display:contents}
+#normalGame .side .panel:first-child{grid-column:2;grid-row:1}
+#normalGame #challengePanel{grid-column:2;grid-row:2}
+#normalGame #angles{grid-column:2;grid-row:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:8px;min-height:0;overflow:auto;padding:2px}
+#normalGame .angle{min-height:52px}
+#normalGame #next{grid-column:2;grid-row:4;width:100%}
+#normalGame .message{top:5%}
 #normalGame .panel{box-shadow:0 3px 10px rgba(24,42,67,.05)}
 
-@media (max-height:700px){
-  #normalGame .arena{width:min(68vh,calc(100vw - 390px),600px);height:min(68vh,calc(100vw - 390px),600px)}
-  #normalGame .angle{min-height:46px}
-}
+/* Protractor mode follows the same learning pattern: observe left, answer right. */
+#protractorGame.game{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+#protractorGame #protractorView{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto minmax(0,1fr) auto;gap:12px;padding:12px}
+#protractorGame .protractor-card{grid-column:1;grid-row:1 / 4;width:min(100%,760px);justify-self:center;align-self:center}
+#protractorGame .protractor-label{grid-column:2;grid-row:1;align-self:end;margin:0}
+#protractorGame .protractor-question{grid-column:2;grid-row:2;align-self:start;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 10px rgba(24,42,67,.05)}
+#protractorGame .protractor-help{font-size:.85rem;font-weight:800;color:var(--navy)}
+#protractorGame .degree-input{width:100%;height:60px}
+#protractorGame .degree-submit{width:100%;min-height:56px}
+#protractorGame .degree-unit{position:absolute;margin-left:250px;margin-top:67px}
+#protractorGame #protractorNext{grid-column:2;grid-row:3;width:100%;justify-self:stretch}
 
-/* Keep the tablet landscape learning layout stable even when browser zoom changes. */
-@media (orientation:landscape){
-  #normalGame.game{grid-template-columns:minmax(0,1fr) 330px}
+@media (max-height:700px){
+#normalGame .arena{width:min(68vh,calc(100vw - 390px),600px);height:min(68vh,calc(100vw - 390px),600px)}
+#normalGame .angle{min-height:46px}
+#protractorGame #protractorView{grid-template-columns:minmax(0,1fr) 280px}
+#protractorGame .protractor-question{padding:12px}
 }
+@media (orientation:landscape){#normalGame.game{grid-template-columns:minmax(0,1fr) 330px}}
