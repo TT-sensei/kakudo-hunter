@@ -1,17 +1,19 @@
-name: Fix protractor pop position
+name: Fix tablet layout media query
 on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+  pull_request_target:
+    types: [opened, synchronize]
 permissions:
   contents: write
 jobs:
   fix:
-    if: github.event.head_commit.message != 'chore: apply tablet answer layout'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Apply tablet landscape answer layout
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+      - name: Replace tablet media query condition
         run: |
           python - <<'PY'
           from pathlib import Path
@@ -20,17 +22,16 @@ jobs:
           old = '@media (pointer: coarse) and (orientation: landscape) and (min-width: 900px) {'
           new = '@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {'
           count = s.count(old)
-          if count:
-              s = s.replace(old, new)
-              p.write_text(s, encoding='utf-8')
-              print(f'replaced {count} tablet media query condition(s)')
-          else:
-              raise SystemExit('target tablet media query condition not found')
+          if count == 0:
+              raise SystemExit('target tablet media query not found')
+          p.write_text(s.replace(old, new), encoding='utf-8')
+          print(f'replaced {count} tablet media query condition(s)')
           PY
-      - name: Commit layout
+      - name: Commit to PR branch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add index.html
-          git diff --cached --quiet || git commit -m 'chore: apply tablet answer layout'
+          git diff --cached --quiet && exit 0
+          git commit -m 'fix: make tablet landscape layout pointer independent'
           git push
