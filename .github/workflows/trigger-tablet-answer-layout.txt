@@ -1,1 +1,1 @@
-apply fixed landscape tablet layout v4
+apply fixed landscape tablet layout v5 - stable protractor size
