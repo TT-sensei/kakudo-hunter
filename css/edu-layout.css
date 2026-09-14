@@ -4,9 +4,13 @@
 #normalGame .arena{width:min(72vh,calc(100vw - 390px),650px);height:min(72vh,calc(100vw - 390px),650px);overflow:visible}
 #normalGame .arena:before{border-radius:50%}
 #normalGame .side{display:contents}
-#normalGame .side .panel:first-child{grid-column:2;grid-row:1}
+#normalGame .side .panel:first-child{grid-column:2;grid-row:1;padding:7px 10px}
+#normalGame .side .panel:first-child h2{display:none}
+#normalGame .side .panel:first-child .stat{display:flex;flex:1;justify-content:center;gap:5px;padding:2px 4px;font-size:.72rem;white-space:nowrap}
+#normalGame .side .panel:first-child .stat b{font-size:.92rem}
+#normalGame .side .panel:first-child{display:flex;align-items:center;justify-content:space-around;gap:2px}
 #normalGame #challengePanel{grid-column:2;grid-row:2}
-#normalGame #angles{grid-column:2;grid-row:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:8px;min-height:0;overflow:auto;padding:2px}
+#normalGame #angles{grid-column:2;grid-row:3;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:8px;min-height:0;overflow:visible;padding:2px}
 #normalGame .angle{min-height:52px}
 #normalGame #next{grid-column:2;grid-row:4;width:100%}
 #normalGame .message{top:5%}
@@ -18,7 +22,7 @@
 #protractorGame .protractor-card{grid-column:1;grid-row:1 / 4;width:min(100%,760px);justify-self:center;align-self:center}
 #protractorGame .protractor-label{grid-column:2;grid-row:1;align-self:end;margin:0}
 #protractorGame .protractor-question{position:relative;grid-column:2;grid-row:2;align-self:start;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 10px rgba(24,42,67,.05)}
-#protractorGame .protractor-help{font-size:.85rem;font-weight:800;color:var(--navy)}
+#protractorGame .protractor-help{font-size:.85rem;font-weight:800;color:var(--navy);white-space:nowrap}
 #protractorGame .degree-input{width:100%;height:60px}
 #protractorGame .degree-submit{width:100%;min-height:56px}
 #protractorGame .degree-unit{position:absolute;right:16px;top:82px;margin:0}
