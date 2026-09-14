@@ -199,23 +199,6 @@
   .monster-group { transition: transform 0.25s; }
   .monster-group.caught { opacity: 0.15; }
 
-  @media (max-width: 700px) {
-    main { display: flex; flex-direction: column; }
-    .stat-sidebar { flex-direction: row; flex-wrap: wrap; max-width: none; }
-    .stat-sidebar .panel { flex: 1; min-width: 130px; }
-    .field-wrap { flex: none; height: 46vh; }
-    #angleButtons {
-      flex-shrink: 0;
-      display: grid;
-      grid-auto-flow: column;
-      grid-template-rows: repeat(2, 1fr);
-      grid-template-columns: none;
-      gap: 8px;
-      padding: 10px 2px 4px;
-      overflow-x: auto;
-      overflow-y: hidden;
-    }
-  }
 </style>
 </head>
 <body>
@@ -316,6 +299,9 @@
     buildField();
     bindLevelSwitch();
     buildAngleButtons();
+    const sidebar = document.querySelector('.stat-sidebar');
+    sidebar.appendChild(angleButtonsEl);
+    sidebar.appendChild(nextBtn);
     updateStatsPanel();
     spawnMonster();
 
