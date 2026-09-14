@@ -1,7 +1,8 @@
 /* edu-kit learning layout: tablet landscape / one-screen */
 #normalGame.game{grid-template-columns:minmax(0,1fr) 330px;grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px 14px}
 #normalGame .arena-wrap{grid-column:1;grid-row:1 / 5;min-height:0;padding:10px}
-#normalGame .arena{width:min(72vh,calc(100vw - 390px),650px);height:min(72vh,calc(100vw - 390px),650px)}
+#normalGame .arena{width:min(72vh,calc(100vw - 390px),650px);height:min(72vh,calc(100vw - 390px),650px);overflow:visible}
+#normalGame .arena:before{border-radius:50%}
 #normalGame .side{display:contents}
 #normalGame .side .panel:first-child{grid-column:2;grid-row:1}
 #normalGame #challengePanel{grid-column:2;grid-row:2}
