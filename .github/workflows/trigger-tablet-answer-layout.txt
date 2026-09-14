@@ -1,1 +1,1 @@
-apply tablet answer layout v3 - one column panels
+apply fixed landscape tablet layout v4
