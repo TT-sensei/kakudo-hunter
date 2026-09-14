@@ -1,1 +1,1 @@
-recover correct index and split it safely
+recover correct index with full history and split
