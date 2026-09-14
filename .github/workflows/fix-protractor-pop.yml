@@ -17,73 +17,15 @@ jobs:
           from pathlib import Path
           p = Path('index.html')
           s = p.read_text(encoding='utf-8')
-          marker = '/* TABLET_ANSWER_LAYOUT_FINAL */'
-          if marker in s:
-              raise SystemExit('tablet layout already applied')
-          css = r'''/* TABLET_ANSWER_LAYOUT_FINAL */
-          @media (pointer: coarse) and (orientation: landscape) and (min-width: 900px) {
-            #normalGame.game {
-              grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
-              grid-template-rows: minmax(0, 1fr) auto auto;
-              column-gap: 18px;
-              row-gap: 10px;
-            }
-            #normalGame .arena-wrap {
-              grid-column: 1;
-              grid-row: 1 / 4;
-              min-width: 0;
-              min-height: 0;
-              padding: 12px;
-            }
-            #normalGame .arena {
-              width: min(78vh, calc(100vw - 440px), 700px);
-              height: min(78vh, calc(100vw - 440px), 700px);
-              min-width: 420px;
-              min-height: 420px;
-            }
-            #normalGame .side {
-              grid-column: 2;
-              grid-row: 1;
-              align-self: start;
-              width: 100%;
-            }
-            #normalGame #angles {
-              grid-column: 2;
-              grid-row: 2;
-              grid-template-columns: repeat(3, minmax(0, 1fr));
-              gap: 10px;
-              width: 100%;
-              align-self: center;
-            }
-            #normalGame .angle {
-              min-height: 64px;
-              font-size: 1.12rem;
-            }
-            #normalGame #angles .angle-select {
-              grid-column: 1 / -1;
-              width: 100%;
-              min-height: 64px;
-              font-size: 1.15rem;
-              border: 2px solid var(--line);
-              border-radius: 14px;
-              padding: 0 14px;
-              background: #fff;
-              color: var(--navy);
-              font-weight: 800;
-            }
-            #normalGame #next {
-              grid-column: 2;
-              grid-row: 3;
-              width: 100%;
-              min-height: 56px;
-              justify-self: stretch;
-            }
-          }
-          '''
-          pos = s.rfind('</style>')
-          if pos < 0:
-              raise SystemExit('style closing tag not found')
-          p.write_text(s[:pos] + css + '\n' + s[pos:], encoding='utf-8')
+          old = '@media (pointer: coarse) and (orientation: landscape) and (min-width: 900px) {'
+          new = '@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {'
+          count = s.count(old)
+          if count:
+              s = s.replace(old, new)
+              p.write_text(s, encoding='utf-8')
+              print(f'replaced {count} tablet media query condition(s)')
+          else:
+              raise SystemExit('target tablet media query condition not found')
           PY
       - name: Commit layout
         run: |
