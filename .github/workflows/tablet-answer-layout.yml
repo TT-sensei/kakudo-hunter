@@ -118,11 +118,12 @@ jobs:
           }
           '''
           marker = '</style>'
-          if s.count(marker) != 1:
-              raise SystemExit(f'expected one closing style tag, found {s.count(marker)}')
+          pos = s.rfind(marker)
+          if pos == -1:
+              raise SystemExit('closing style tag not found')
           if 'Tablet landscape: keep the problem large and move answer controls to the right.' in s:
               raise SystemExit('tablet layout already applied')
-          s = s.replace(marker, css + '\n' + marker, 1)
+          s = s[:pos] + css + '\n' + s[pos:]
           p.write_text(s, encoding='utf-8')
           PY
 
