@@ -1,0 +1,37 @@
+name: Keep tablet layout fixed horizontally
+
+on:
+  push:
+    paths:
+      - '.github/workflows/trigger-tablet-answer-layout.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix layout
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+          p = Path('angle-hunter.html')
+          s = p.read_text(encoding='utf-8')
+
+          # タブレットは常に横2カラム。ズームでCSS幅が700px未満になっても縦積みにしない。
+          s = re.sub(r'\n  @media \(max-width: 700px\) \{.*?\n  \}\n</style>', '\n</style>', s, flags=re.S)
+
+          # 答えボタンと次ボタンを右側サイドバーへ固定配置。
+          if 'sidebar.appendChild(angleButtonsEl)' not in s:
+              s = s.replace('''    buildAngleButtons();\n    updateStatsPanel();''', '''    buildAngleButtons();\n    const sidebar = document.querySelector('.stat-sidebar');\n    sidebar.appendChild(angleButtonsEl);\n    sidebar.appendChild(nextBtn);\n    updateStatsPanel();''')
+
+          p.write_text(s, encoding='utf-8')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add angle-hunter.html
+          git diff --cached --quiet || git commit -m 'Fix fixed landscape tablet layout'
+          git push
