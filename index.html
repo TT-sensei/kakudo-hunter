@@ -1,173 +1,228 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ANGLE HUNTER - ナビアンをつかまえろ</title>
-<link rel="stylesheet" href="https://tt-sensei.github.io/edu-effects/css/edu-effects.css"><link rel="stylesheet" href="https://tt-sensei.github.io/edu-effects/css/edu-learning.css"><link rel="stylesheet" href="https://tt-sensei.github.io/edu-effects/css/edu-feedback.css">
-<style>
-:root{--bg:#eef3f7;--card:#fff;--navy:#17233b;--muted:#667085;--line:#d9e1ea;--green:#168b68;--green2:#dff6ed;--gold:#e3a400;--gold2:#fff2c7;--red:#d95555;--red2:#ffe5e5;--blue:#3478c8}*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;background:var(--bg);color:var(--navy);touch-action:manipulation}button,input{font:inherit}button:focus-visible,input:focus-visible{outline:3px solid #75aef5;outline-offset:2px}.hidden{display:none!important}
-#start{position:fixed;inset:0;z-index:50;display:block;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding:20px 14px 28px;background:linear-gradient(135deg,rgba(20,34,59,.50),rgba(20,34,59,.78)),url('https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/backgrounds/town.png') center/cover}.start-card{width:min(1050px,100%);margin:0 auto;padding:34px;border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 24px 70px rgba(0,0,0,.25)}.start-head{display:flex;align-items:center;gap:22px}.town-group{width:132px;height:132px;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(0,0,0,.18))}.start-title h1{margin:0;font-size:clamp(2rem,5vw,4rem);letter-spacing:.05em}.start-title p{margin:8px 0 0;color:var(--muted)}.mode-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:24px}.mode{min-height:150px;padding:18px;border:2px solid var(--line);border-radius:18px;background:#fff;color:var(--navy);text-align:left;box-shadow:0 4px 12px rgba(24,42,67,.05)}.mode-mark{display:block;font-size:1.65rem;color:var(--green);margin-bottom:7px}.mode b{display:block;font-size:1.02rem;margin-bottom:6px}.mode-desc{color:var(--muted);font-size:.78rem;line-height:1.55}.step-select{display:flex;gap:6px;margin-top:12px}.step-btn{flex:1;min-width:0;min-height:46px;padding:6px 4px;border:2px solid var(--line);border-radius:12px;background:#f8fafc;color:var(--navy);font-weight:900;font-size:1rem;cursor:pointer}.step-btn:hover,.step-btn:active{border-color:#82cdb5;background:var(--green2)}.book-mode{grid-column:auto;min-height:150px}.start-note{text-align:center;color:var(--muted);font-size:.75rem;margin:18px 0 0}
-#app{width:100%;height:100%;max-width:1280px;margin:auto;padding:12px 18px 14px;display:flex;flex-direction:column;gap:10px}.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto}.brand h1{margin:0;font-size:1.35rem;letter-spacing:.04em}.brand p{margin:2px 0 0;font-size:.72rem;color:var(--muted)}.actions{display:flex;gap:7px;align-items:center}.pill,.head-btn{min-height:42px;padding:7px 13px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-weight:700;box-shadow:0 2px 8px rgba(24,42,67,.05)}.pill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
-.game{min-height:0;flex:1;display:grid;grid-template-columns:minmax(0,1fr) 220px;grid-template-rows:minmax(0,1fr) auto;gap:10px 14px}.arena-wrap{position:relative;min-width:0;min-height:0;display:grid;place-items:center;padding:16px;border-radius:28px;overflow:hidden;background:linear-gradient(rgba(24,48,34,.18),rgba(255,255,255,.08)),url('https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/cards/backgrounds/forest.jpeg') center/cover;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 10px 28px rgba(24,42,67,.10)}.arena-wrap:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at center,rgba(255,255,255,.08),rgba(16,33,27,.20));pointer-events:none}.arena{position:relative;width:min(72vh,calc(100vw - 330px),650px);height:min(72vh,calc(100vw - 330px),650px);min-width:380px;min-height:380px;border-radius:50%;overflow:hidden;background:#fff;border:7px solid rgba(255,255,255,.98);box-shadow:0 14px 35px rgba(12,28,24,.20),0 0 0 2px rgba(28,60,45,.16);z-index:1}.arena:before{content:"";position:absolute;inset:0;background:rgba(255,255,255,.97);z-index:1;pointer-events:none}.arena:after{content:"";position:absolute;inset:9%;border:2px dashed rgba(52,120,200,.28);border-radius:50%;z-index:2;pointer-events:none}.field{position:absolute;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}.field svg{display:block;width:100%;height:100%;overflow:visible}.angle-sector{fill:rgba(22,139,104,.10);stroke:rgba(22,139,104,.72);stroke-width:3;stroke-linejoin:round}.angle-sector.active{fill:rgba(22,139,104,.16);stroke:rgba(22,139,104,.92);stroke-width:4}.zero-line{position:absolute;left:50%;top:50%;width:45%;height:4px;background:#18243a;transform-origin:0 50%;transform:translateY(-50%);z-index:6}.zero-line:after{content:"0°";position:absolute;right:-28px;top:-17px;font-weight:900;font-size:14px;color:#18243a;background:#fff;border-radius:999px;padding:2px 5px}.aim,.correct-line,.net{position:absolute;left:50%;top:50%;height:5px;width:0;transform-origin:0 50%;border-radius:9px;z-index:7;opacity:0;pointer-events:none}.aim{background:var(--green);box-shadow:0 0 9px rgba(22,139,104,.45)}.aim.show{opacity:.98}.correct-line{background:var(--gold);box-shadow:0 0 11px rgba(227,164,0,.55)}.correct-line.show{opacity:.95}.net.right{background:var(--gold);box-shadow:0 0 12px var(--gold);opacity:1}.net.wrong{background:var(--red);box-shadow:0 0 10px var(--red);opacity:1}.center{position:absolute;left:50%;top:50%;width:17px;height:17px;border:4px solid #fff;border-radius:50%;background:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.25);transform:translate(-50%,-50%);z-index:9}.navian{position:absolute;width:92px;height:92px;object-fit:contain;transform:translate(-50%,-50%);z-index:8;filter:drop-shadow(0 7px 7px rgba(0,0,0,.22));transition:opacity .2s,transform .25s}.navian.running{animation:bob .16s ease-in-out infinite alternate}@keyframes bob{from{margin-top:-2px}to{margin-top:2px}}.navian.caught{opacity:0;transform:translate(-50%,-50%) scale(1.45);filter:drop-shadow(0 0 18px var(--gold))}.message{position:absolute;left:50%;top:7%;transform:translateX(-50%);z-index:12;padding:8px 18px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:800;white-space:nowrap;opacity:0;box-shadow:0 5px 15px rgba(24,42,67,.12)}.message.show{opacity:1}.message.hit{color:#8b6200;border-color:#efc85e;background:var(--gold2)}.message.miss{color:#b13d3d;border-color:#ee9999;background:var(--red2)}
-.side{display:flex;flex-direction:column;gap:9px;min-width:0}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 14px;box-shadow:0 4px 14px rgba(24,42,67,.06)}.panel h2{margin:0 0 7px;font-size:.75rem;color:var(--muted)}.stat{display:flex;justify-content:space-between;align-items:center;padding:3px 0;font-size:.84rem}.stat b{font-size:1rem}.challenge-timer{font-size:2.15rem!important;color:var(--red)!important;min-width:76px;text-align:center;line-height:1;letter-spacing:.03em}.challenge-timer.urgent{animation:timerPulse .55s ease-in-out infinite alternate}@keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.12)}}.challenge-header-timer{display:inline-flex;align-items:center;justify-content:center;min-width:76px;padding:7px 12px;border-radius:999px;background:var(--red2);border:2px solid #ee9999;color:var(--red);font-size:1.35rem;font-weight:1000;line-height:1;letter-spacing:.03em}.challenge-header-timer.urgent{animation:timerPulse .55s ease-in-out infinite alternate}@keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.12)}}.challenge-score{font-size:1.7rem!important;color:var(--green)!important}.hint{color:var(--muted);font-size:.72rem;line-height:1.6}.mode-label{display:inline-flex;padding:4px 8px;border-radius:999px;background:var(--green2);color:#087052;font-size:.7rem;font-weight:800}
-#angles{grid-column:1;display:grid;grid-template-columns:repeat(6,1fr);gap:8px;position:relative;z-index:30;pointer-events:auto;isolation:isolate}.angle{min-height:54px;border:2px solid var(--line);border-radius:13px;background:#fff;color:var(--navy);font-size:1rem;font-weight:800;box-shadow:0 3px 8px rgba(24,42,67,.06);position:relative;z-index:31;pointer-events:auto;touch-action:manipulation;cursor:pointer;user-select:none}.angle:active{transform:scale(.97)}.angle.correct{background:var(--gold2);border-color:#e7bd43;color:#805900}.angle.wrong{background:var(--red2);border-color:#e28c8c;color:#a73535}#next{grid-column:1;display:none;justify-self:center;min-height:48px;padding:10px 28px;border:0;border-radius:999px;background:var(--green);color:#fff;font-weight:800;box-shadow:0 5px 12px rgba(22,139,104,.2);position:relative;z-index:30}#protractorNext{grid-column:1;display:none;justify-self:center;min-height:48px;padding:10px 28px;border:0;border-radius:999px;background:var(--green);color:#fff;font-weight:800;box-shadow:0 5px 12px rgba(22,139,104,.2);position:relative;z-index:30}
-#protractorView{position:relative;min-width:0;min-height:0;display:grid;place-items:center;padding:10px}.protractor-card{position:relative;width:min(94%,760px);aspect-ratio:2/1.06;background:#fff;border:5px solid rgba(255,255,255,.98);border-radius:24px 24px 12px 12px;box-shadow:0 14px 35px rgba(12,28,24,.20),0 0 0 2px rgba(28,60,45,.16);overflow:hidden}.protractor-svg{position:absolute;inset:0;width:100%;height:100%;z-index:2}.protractor-svg text{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;font-weight:900;fill:#24344f}.protractor-base{position:absolute;left:8%;right:8%;bottom:13%;height:4px;background:#17233b;z-index:4}.protractor-center{position:absolute;left:50%;bottom:calc(13% - 7px);width:18px;height:18px;background:#17233b;border:4px solid #fff;border-radius:50%;transform:translateX(-50%);z-index:7}.protractor-ray{position:absolute;left:50%;bottom:13%;height:5px;width:0;background:var(--green);transform-origin:0 50%;z-index:6;border-radius:9px;box-shadow:0 0 9px rgba(22,139,104,.45)}.protractor-ray.show{opacity:.98}.protractor-correct-line{position:absolute;left:50%;bottom:13%;height:5px;width:0;background:var(--gold);transform-origin:0 50%;z-index:5;border-radius:9px;opacity:0;box-shadow:0 0 11px rgba(227,164,0,.55)}.protractor-correct-line.show{opacity:.95}.protractor-navian{position:absolute;width:70px;height:70px;object-fit:contain;z-index:8;transform:translate(-50%,-50%);filter:drop-shadow(0 6px 6px rgba(0,0,0,.22));transition:left .08s linear,top .08s linear,transform .25s}.protractor-navian.running{animation:sidebob .16s ease-in-out infinite alternate}@keyframes sidebob{from{margin-top:-2px}to{margin-top:2px}}.protractor-navian.caught{transform:translate(-50%,-50%) scale(1.3);opacity:0}.protractor-label{grid-column:1;position:static;justify-self:center;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid var(--line);font-weight:900;white-space:nowrap;margin:0 0 4px}.protractor-label.hit{color:#8b6200;border-color:#efc85e;background:var(--gold2)}.protractor-label.miss{color:#b13d3d;border-color:#ee9999;background:var(--red2)}.protractor-hints{grid-column:1;display:flex;align-items:center;justify-content:center;gap:18px;min-height:28px}.protractor-direction{position:static;font-size:.78rem;color:var(--muted);font-weight:800;z-index:8}.protractor-question{grid-column:1;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap}.degree-input{width:110px;height:54px;border:2px solid var(--line);border-radius:14px;background:#fff;text-align:center;font-size:1.5rem;font-weight:900;color:var(--navy)}.degree-submit{min-height:54px;padding:10px 24px;border:0;border-radius:14px;background:var(--green);color:#fff;font-weight:900}.degree-submit:disabled{opacity:.5}.degree-unit{font-weight:900}.protractor-help{color:var(--muted);font-size:.78rem}.protractor-wrong{background:var(--red2)!important;border-color:#e28c8c!important}.protractor-correct{background:var(--gold2)!important;border-color:#e7bd43!important}
-#book{position:fixed;inset:0;z-index:45;background:var(--bg);overflow:auto}.book-shell{width:min(1100px,100%);margin:auto;padding:18px}.book-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.book-head h2{margin:0}.book-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.book-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:10px;text-align:center;box-shadow:0 3px 10px rgba(24,42,67,.05)}.book-card img{width:100%;height:125px;object-fit:contain}.book-card span{display:block;margin-top:5px;color:var(--muted);font-size:.68rem;line-height:1.4}
-#result{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;background:rgba(23,35,59,.48);backdrop-filter:blur(7px)}.result-card{width:min(520px,100%);padding:34px 25px;border-radius:24px;background:#fff;text-align:center;box-shadow:0 24px 70px rgba(0,0,0,.22)}.result-card h2{margin:0}.result-number{margin:12px 0;font-size:5rem;line-height:1;color:var(--green);font-weight:900}.result-card p{color:var(--muted)}.result-actions{display:flex;justify-content:center;gap:8px}.result-actions button{min-height:48px;padding:10px 24px;border:0;border-radius:999px;font-weight:800}.again{background:var(--green);color:#fff}.title-back{background:#e9eef4;color:var(--navy)}
-@media(pointer:coarse) and (orientation:landscape),(min-width:1051px){.game{grid-template-columns:minmax(0,1fr) 220px}.arena{width:min(72vh,calc(100vw - 330px),650px);height:min(72vh,calc(100vw - 330px),650px)}}@media(max-width:1050px){html,body{overflow:hidden}#app{padding:8px 10px}.brand p{display:none}.game{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto}.side{position:absolute;top:62px;right:10px;width:185px;z-index:15}.side .panel:nth-child(n+2){display:none}.arena-wrap{padding:10px}.arena{width:min(64vh,82vw);height:min(64vh,82vw);min-width:300px;min-height:300px}#angles{grid-column:1}.angle{min-height:50px}.book-grid{grid-template-columns:repeat(4,1fr)}.mode-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.mode{min-height:150px;padding:14px}.book-mode{grid-column:auto;min-height:150px}.protractor-card{width:96%}}@media(max-width:600px){.topbar{height:48px}.brand h1{font-size:1.05rem}.actions{gap:3px}.pill,.head-btn{min-height:38px;padding:6px 9px;font-size:.75rem}.arena{width:min(56vh,90vw);height:min(56vh,90vw);min-width:270px;min-height:270px}.navian{width:72px;height:72px}.angle{min-height:46px;font-size:.82rem}.side{width:155px}.book-grid{grid-template-columns:repeat(3,1fr)}.book-card img{height:95px}.start-card{padding:22px 17px}.start-head{gap:10px}.town-group{width:78px;height:78px}.start-title h1{font-size:1.7rem}.step-btn{min-height:44px}.protractor-navian{width:56px;height:56px}.protractor-label{font-size:.75rem}.protractor-question{gap:7px}.degree-input{width:92px;height:48px}.degree-submit{min-height:48px;padding:8px 17px}}@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
-@media(max-width:700px){.mode-grid{grid-template-columns:1fr}.book-mode{min-height:95px}.start-card{padding:22px 17px}.start-head{gap:10px}.town-group{width:78px;height:78px}.start-title h1{font-size:1.7rem}}@media(max-width:700px){.mode-grid{grid-template-columns:1fr}.book-mode{min-height:95px}}@media(max-width:1050px){
-.game{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) auto;min-height:0}
-.arena-wrap{min-height:0;padding:10px}
-.arena{width:min(64vh,82vw);height:min(64vh,82vw);min-width:300px;min-height:300px}
-.side{position:absolute;top:62px;right:10px;width:185px;z-index:15}
-.protractor-card{width:96%;max-width:760px}
-}
-@media(max-width:700px){
-.arena{width:min(58vh,84vw);height:min(58vh,84vw);min-width:280px;min-height:280px}
-.side{width:160px;right:8px}
-.protractor-card{width:98%}
-.protractor-navian{width:64px;height:64px}
-}
-</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ANGLE HUNTER - 角度を見抜け</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
 
-<style id="answer-15-degree-select-style">
-#angles .angle-select{width:100%;min-height:54px;padding:8px 46px 8px 16px;border:2px solid var(--line);border-radius:13px;background:#fff;color:var(--navy);font:inherit;font-size:1.05rem;font-weight:900;box-shadow:0 3px 8px rgba(24,42,67,.06);cursor:pointer;touch-action:manipulation}
-#angles .angle-select:focus{border-color:#82cdb5;outline:3px solid rgba(130,205,181,.25);outline-offset:1px}
-@media(max-width:1050px){#angles .angle-select{min-height:54px;font-size:1rem}}
+<canvas id="stars"></canvas>
 
-/* Tablet landscape: keep the problem large and move answer controls to the right. */
-@media (orientation: landscape) and (min-width: 900px) and (min-height: 600px) {
-  .game {
-    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
-    grid-template-rows: minmax(0, 1fr) auto auto;
-    gap: 10px 18px;
-  }
+<div id="app">
 
-  .arena-wrap {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    min-width: 0;
-    min-height: 0;
-    padding: 18px;
-  }
+  <header>
+    <div class="title-block">
+      <h1>ANGLE HUNTER</h1>
+      <p>角度を見抜け。ドリナビスをつかまえろ。</p>
+    </div>
+    <div class="level-switch" id="levelSwitch">
+      <button class="level-btn active" data-step="30">かんたん(30°)</button>
+      <button class="level-btn" data-step="15">ふつう(15°)</button>
+    </div>
+  </header>
 
-  .arena {
-    width: min(76vh, calc(100vw - 420px), 680px);
-    height: min(76vh, calc(100vw - 420px), 680px);
-    min-width: 400px;
-    min-height: 400px;
-  }
+  <main>
+    <div class="field-wrap">
+      <div id="message" style="display:none;"></div>
+      <svg id="fieldSvg" viewBox="0 0 400 400"></svg>
+    </div>
 
-  .side {
-    grid-column: 2;
-    grid-row: 1;
-    align-self: start;
-  }
+    <div class="stat-sidebar">
+      <div class="panel">
+        <h2>きろく</h2>
+        <div class="stat-row"><span>ちょうせん</span><span id="statAttempts">0</span></div>
+        <div class="stat-row"><span>せいかい</span><span id="statCorrect">0</span></div>
+        <div class="stat-row"><span>せいとうりつ</span><span id="statRate">0%</span></div>
+        <div class="stat-row"><span>さいこう連続</span><span id="statStreak">0</span></div>
+      </div>
+      <div class="panel">
+        <h2>にがてな角度</h2>
+        <div id="weakAngles" style="min-height:20px;">まだデータなし</div>
+      </div>
+    </div>
+  </main>
 
-  #angles {
-    grid-column: 2;
-    grid-row: 2;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-    align-self: center;
-  }
+  <div id="angleButtons"></div>
+  <button id="nextBtn">つぎのモンスター ▶</button>
 
-  .angle {
-    min-height: 64px;
-    font-size: 1.08rem;
-  }
+</div>
 
-  #next,
-  #protractorNext {
-    grid-column: 2;
-    grid-row: 3;
-    justify-self: stretch;
-    width: 100%;
-    min-height: 54px;
-  }
-
-  #protractorView {
-    grid-column: 1;
-    grid-row: 1 / span 3;
-    min-width: 0;
-    min-height: 0;
-    padding: 10px 18px;
-  }
-
-  .protractor-card {
-    width: min(96%, 860px);
-  }
-
-  .protractor-question {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: center;
-    justify-self: stretch;
-    flex-wrap: nowrap;
-    padding: 10px;
-    background: #fff;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    box-shadow: 0 4px 14px rgba(24,42,67,.06);
-  }
-
-  .degree-input {
-    width: 120px;
-    height: 58px;
-    font-size: 1.65rem;
-  }
-
-  .degree-submit {
-    min-height: 58px;
-    padding: 10px 22px;
-  }
-
-  .protractor-help {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: end;
-    justify-self: center;
-    transform: translateY(58px);
-  }
-}
-
-</style>
-</head><body>
-<div id="start" class="deco-fantasy"><div class="start-card"><div class="start-head"><img class="town-group" src="https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/fantasy/groups/group-fantasy-town.png" alt="ナビアンのなかまたち"><div class="start-title"><h1>ANGLE HUNTER</h1><p>角度を見抜け。ナビアンをつかまえろ。</p></div></div><div class="mode-grid"><div class="mode"><span class="mode-mark">◈</span><b>ハンターモード</b><span class="mode-desc">角度のきざみを選んで、ナビアンをつかまえよう。</span><div class="step-select"><button class="step-btn" data-mode="hunter" data-step="30">30°</button><button class="step-btn" data-mode="hunter" data-step="15">15°</button><button class="step-btn" data-mode="hunter" data-step="1">1°</button></div></div><div class="mode"><span class="mode-mark">◆</span><b>チャレンジモード</b><span class="mode-desc">60秒で何体つかまえられる？角度のきざみを選んで挑戦しよう。</span><div class="step-select"><button class="step-btn" data-mode="challenge" data-step="30">30°</button><button class="step-btn" data-mode="challenge" data-step="15">15°</button><button class="step-btn" data-mode="challenge" data-step="1">1°</button></div></div><button class="mode book-mode" onclick="location.href='book.html'" data-mode="book"><span class="mode-mark">▣</span><b>ナビアン図鑑</b><span class="mode-desc">出会えるナビアンを一覧でチェック。</span></button></div><p class="start-note">30°・15°・1°から選ぼう　｜　見る → 考える → 角度を読む → つかまえる</p></div></div>
-<div id="app" class="hidden"><header class="topbar"><div class="brand"><h1>ANGLE HUNTER</h1><p id="brandHint">ナビアンが止まった角度を見抜こう</p></div><div class="actions"><span class="pill active" id="stepLabel">30°</span><span class="challenge-header-timer hidden" id="timer">60</span><button class="head-btn" id="titleBtn">タイトル</button></div></header><div class="game" id="normalGame"><div class="arena-wrap"><div class="arena" id="stage"><div class="field" id="field"></div><div class="zero-line"></div><div class="aim" id="aim"></div><div class="correct-line" id="correctLine"></div><div class="net" id="net"></div><div class="center"></div><img class="navian" id="navian" alt="ナビアン"><div class="message" id="message"></div></div></div><aside class="side"><div class="panel"><h2 id="recordTitle">きろく</h2><div class="stat"><span>ちょうせん</span><b id="attempts">0</b></div><div class="stat"><span>せいかい</span><b id="correct">0</b></div><div class="stat"><span>せいかい率</span><b id="rate">0%</b></div></div><div class="panel" id="challengePanel"><h2>チャレンジ</h2><div class="stat"><span>捕獲数</span><b class="challenge-score" id="score">0</b></div></div><div class="panel"><span class="mode-label" id="modeLabel">ハンター</span><p class="hint">ナビアンが止まった位置と、0°の線をくらべて角度を選ぼう。</p></div></aside><div id="angles"></div><button id="next">つぎのナビアン ▶</button></div>
-<div id="protractorGame" class="game hidden"><div class="arena-wrap" id="protractorView"><div class="protractor-card" id="protractorCard"><svg id="protractorSvg" class="protractor-svg" viewBox="0 0 800 424" aria-label="180度分度器"><path d="M 114 370 A 286 286 0 0 1 686 370" fill="none" stroke="#24344f" stroke-width="2.5"/><path d="M 150 370 A 250 250 0 0 1 650 370" fill="none" stroke="#b8c4d1" stroke-width="1.5"/><g id="protractorTicks"></g><g id="protractorNumbers"></g><path id="protractorAngleArc" d="" fill="none" stroke="#168b68" stroke-width="7" stroke-linecap="round"/></svg><div class="protractor-base"></div><div class="protractor-center"></div><div class="protractor-ray" id="protractorRay"></div><div class="protractor-correct-line" id="protractorCorrectLine"></div><img class="protractor-navian" id="protractorNavian" alt="ナビアン"></div><div class="protractor-label" id="protractorLabel">分度器で角度を読もう</div><div class="protractor-question"><span class="protractor-help">ナビアンが止まった線は、何度？</span><input id="degreeInput" class="degree-input" type="number" inputmode="numeric" min="0" max="180" step="1" aria-label="角度"><span class="degree-unit">°</span><button id="degreeSubmit" class="degree-submit">答える</button></div><button id="protractorNext">つぎのナビアン ▶</button></div></div>
-<div id="result" class="hidden"><div class="result-card"><h2>チャレンジ終了！</h2><div class="result-number" id="resultNumber">0</div><p>ナビアン捕獲！</p><div class="result-actions"><button class="again" id="again">もう一度</button><button class="title-back" id="resultTitle">タイトルへ</button></div></div></div>
-<div id="book" class="hidden"><div class="book-shell"><div class="book-head"><h2>ナビアン図鑑</h2><button class="head-btn" id="bookBack">タイトル</button></div><div class="book-grid" id="bookGrid"></div></div></div>
 <script>
-const NAV='https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/web/fantasy/monsters/zako/';
-const NAVIANS=['acorn-leafy.webp','aurora-shell-lizard.webp','autumn-mushroom.webp','berry-leafy.webp','bubblefin-frog.webp','candy-coral-slug.webp','cloud-rain-rabbit.webp','clover-mandragora.webp','cobalt-blade-mantis.webp','coral-bubble-crab.webp','dusk-feather-owl.webp','forest-puru.webp','happa-squirrel-leafy.webp','hinoko-ember-newt.webp','kinoko-apple-mushroom.webp','komorin-little-night-bat.webp','koro-golem-pebble-golem.webp','mofu-wolf-frost-pup.webp','purun-little-magic-slime.webp','yukimaru-snow-puff.webp'];
-const NAMES=['どんぐりリーフ','オーロラシェルリザード','オータムキノコ','ベリーリーフ','バブルリーフ','キャンディコーラルナメクジ','くもあめウサギ','クローバーマンドラゴラ','コバルトブレードカマキリ','コーラルバブルクラブ','たそがれフクロウ','森ぷる','はっぱリス','ひのこイモリ','りんごキノコ','こもりんナイトバット','ころゴーレム','もふウルフ','ぷるんスライム','ゆきまるスノーパフ'];
-const $=id=>document.getElementById(id),C={cx:200,cy:200,r:155,navR:132};let step=30,mode='hunter',target=0,anim=null,locked=false,timerId=null,timeLeft=60,score=0,stats=loadStats(),protractorVisualTarget=0,currentNavian='';
-function loadStats(){try{return JSON.parse(localStorage.getItem('angleHunter.stats.v2'))||{attempts:0,correct:0,weak:{}}}catch(e){return{attempts:0,correct:0,weak:{}}}}function saveStats(){localStorage.setItem('angleHunter.stats.v2',JSON.stringify(stats))}function recordNavianGet(src){try{const key='angleHunter.navianGets.v1';const gets=JSON.parse(localStorage.getItem(key))||{};const file=(src||'').split('/').pop();if(!file)return;gets[file]=(Number(gets[file])||0)+1;localStorage.setItem(key,JSON.stringify(gets))}catch(e){}}function point(deg,r=C.navR){const a=-deg*Math.PI/180;return{x:C.cx+Math.cos(a)*r,y:C.cy+Math.sin(a)*r}}function sectorPath(deg,r=104){if(deg<=0)return `M ${C.cx} ${C.cy} L ${C.cx+r} ${C.cy} Z`;const a=-deg*Math.PI/180,x=C.cx+Math.cos(a)*r,y=C.cy+Math.sin(a)*r,large=deg>180?1:0;return `M ${C.cx} ${C.cy} L ${C.cx+r} ${C.cy} A ${r} ${r} 0 ${large} 0 ${x} ${y} Z`}function setSector(deg,strong=false){const e=$('angleSector');if(!e)return;e.setAttribute('d',sectorPath(deg));e.setAttribute('class',strong?'angle-sector active':'angle-sector')}
-function drawField(){let s='<svg viewBox="0 0 400 400" width="100%" height="100%" aria-hidden="true">';s+='<path id="angleSector" class="angle-sector" d="'+sectorPath(0)+'"/><circle cx="200" cy="200" r="155" fill="none" stroke="#24344f" stroke-width="2.5" opacity=".65"/>';for(let d=0;d<360;d+=step){const a=-d*Math.PI/180,major=d%30===0,r1=major?143:150,r2=160,x1=200+Math.cos(a)*r1,y1=200+Math.sin(a)*r1,x2=200+Math.cos(a)*r2,y2=200+Math.sin(a)*r2;s+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#24344f" stroke-width="${major?3.5:2}" opacity="${major?'.9':'.62'}" stroke-linecap="round"/>`;if(major)s+=`<text x="${200+Math.cos(a)*128}" y="${200+Math.sin(a)*128+5}" text-anchor="middle" font-size="13" font-weight="800" fill="#24344f">${d}°</text>`}s+='</svg>';$('field').innerHTML=s}
-function buildAngles(){const box=$('angles');box.innerHTML='';if(step===15){for(let d=0;d<360;d+=15){const b=document.createElement('button');b.type='button';b.className='angle';b.textContent=d+'°';const choose=ev=>{ev.preventDefault();answer(d,b)};b.addEventListener('pointerup',choose);box.appendChild(b)}return}for(let d=0;d<360;d+=step){const b=document.createElement('button');b.type='button';b.className='angle';b.textContent=d+'°';const choose=ev=>{ev.preventDefault();answer(d,b)};b.addEventListener('pointerup',choose);box.appendChild(b)}}function setLine(el,deg,len=C.r){el.style.width=len+'px';el.style.transform=`rotate(${-deg}deg)`}function posNav(deg){const p=point(deg);$('navian').style.left=p.x/400*100+'%';$('navian').style.top=p.y/400*100+'%'}function resetLines(){['aim','correctLine','net'].forEach(id=>{const e=$(id);e.className=id;e.style.width='0';e.style.opacity='0'});setSector(0,false);$('message').className='message';$('message').textContent=''}function randomNav(){currentNavian=NAVIANS[Math.floor(Math.random()*NAVIANS.length)];return currentNavian}
-function spawn(){cancelAnimationFrame(anim);anim=null;locked=false;resetLines();$('next').style.display='none';$('navian').className='navian';$('navian').src=NAV+randomNav();target=Math.floor(Math.random()*(360/step))*step;posNav(0);let duration=850+target*3.1;if(mode==='challenge')duration=420;$('navian').classList.add('running');$('aim').classList.add('show');setLine($('aim'),0,C.r);setSector(0,false);const t0=performance.now();function tick(t){const p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,2),deg=target*e;posNav(deg);setLine($('aim'),deg,C.r);setSector(deg,false);if(p<1)anim=requestAnimationFrame(tick);else{$('navian').classList.remove('running');posNav(target);setLine($('aim'),target,C.r);setSector(target,true);locked=true;anim=null}}anim=requestAnimationFrame(tick)}
-function feedback(text,kind){const m=$('message');m.textContent=text;m.className='message show '+kind}function answer(choice,button){if(!locked)return;locked=false;stats.attempts++;const ok=choice===target;if(ok){stats.correct++;score++;recordNavianGet($('navian').src);button.classList.add('correct');$('navian').classList.add('caught');setLine($('net'),choice,C.r);$('net').classList.add('right');setSector(target,true);feedback('GET！ '+target+'°','hit')}else{stats.weak[target]=(stats.weak[target]||0)+1;button.classList.add('wrong');setLine($('net'),choice,C.r);$('net').classList.add('wrong');setLine($('correctLine'),target,C.r);$('correctLine').classList.add('show');setSector(target,true);feedback('おしい！ 正解は '+target+'°','miss')}saveStats();renderStats();if(mode==='challenge'){setTimeout(()=>{if(timeLeft>0)spawn()},ok?260:1000)}else{$('next').style.display='inline-flex'}}
-function renderStats(){$('attempts').textContent=stats.attempts;$('correct').textContent=stats.correct;$('rate').textContent=stats.attempts?Math.round(stats.correct/stats.attempts*100)+'%':'0%';$('score').textContent=score;$('timer').textContent=timeLeft;$('timer').classList.toggle('hidden',mode!=='challenge');$('stepLabel').textContent=step===1?'1°刻み':step+'°'}
-function startGame(newMode,newStep=30){mode=newMode;step=Number(newStep);if(mode==='book'){openBook();return}if(step===1){startProtractor();return}clearInterval(timerId);timerId=null;$('start').classList.add('hidden');$('result').classList.add('hidden');$('app').classList.remove('hidden');$('normalGame').classList.remove('hidden');$('protractorGame').classList.add('hidden');$('modeLabel').textContent=mode==='challenge'?'チャレンジ':'ハンター';$('recordTitle').textContent=mode==='challenge'?'今回の記録':'きろく';$('challengePanel').classList.toggle('hidden',mode!=='challenge');$('brandHint').textContent='ナビアンが止まった角度を見抜こう';score=0;timeLeft=60;renderStats();drawField();buildAngles();if(mode==='challenge'){renderStats();timerId=setInterval(()=>{timeLeft--;renderStats();const timerEl=$('timer');if(timerEl)timerEl.classList.toggle('urgent',timeLeft<=10&&timeLeft>0);if(timeLeft<=0){clearInterval(timerId);timerId=null;if(timerEl){timerEl.textContent='0';timerEl.classList.remove('urgent')}finishChallenge()}},1000);}spawn()}
-function finishChallenge(){cancelAnimationFrame(anim);anim=null;locked=false;$('navian').className='navian';$('resultNumber').textContent=score;$('result').classList.remove('hidden')}
-function buildProtractor(){const ticks=$('protractorTicks'),nums=$('protractorNumbers');ticks.innerHTML='';nums.innerHTML='';const cx=400,cy=370,r=286,inner=268;for(let d=0;d<=180;d++){const a=Math.PI-d*Math.PI/180,major=d%10===0,mid=d%5===0,r1=major?inner-12:mid?inner-7:inner-3,r2=r,x1=cx+Math.cos(a)*r1,y1=cy-Math.sin(a)*r1,x2=cx+Math.cos(a)*r2,y2=cy-Math.sin(a)*r2,line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',x1);line.setAttribute('y1',y1);line.setAttribute('x2',x2);line.setAttribute('y2',y2);line.setAttribute('stroke',major?'#344054':mid?'#667085':'#98a2b3');line.setAttribute('stroke-width',major?'2.5':mid?'1.7':'1');ticks.appendChild(line);if(major){const t=document.createElementNS('http://www.w3.org/2000/svg','text'),nr=inner-29;t.setAttribute('x',cx+Math.cos(a)*nr);t.setAttribute('y',cy-Math.sin(a)*nr+5);t.setAttribute('text-anchor','middle');t.setAttribute('font-size','16');t.setAttribute('fill','#24344f');t.textContent=d;nums.appendChild(t);const t2=document.createElementNS('http://www.w3.org/2000/svg','text'),nr2=inner-57;t2.setAttribute('x',cx+Math.cos(a)*nr2);t2.setAttribute('y',cy-Math.sin(a)*nr2+5);t2.setAttribute('text-anchor','middle');t2.setAttribute('font-size','15');t2.setAttribute('fill','#3478c8');t2.setAttribute('opacity','.72');t2.textContent=180-d;nums.appendChild(t2)}}}
-function proPoint(deg,r=320){const a=Math.PI-deg*Math.PI/180;return{x:400+Math.cos(a)*r,y:370-Math.sin(a)*r}}
-function setProtractorLine(deg){const line=$('protractorRay'),correct=$('protractorCorrectLine'),len=330;line.style.left='50%';line.style.bottom='13%';line.style.width=len+'px';line.style.transform=`rotate(${deg-180}deg)`;correct.style.left='50%';correct.style.bottom='13%';correct.style.width=len+'px';correct.style.transform=`rotate(${deg-180}deg)`}
-function setProtractorArc(startDeg,endDeg){const arc=$('protractorAngleArc');if(!arc)return;const r=92,rad=d=>(Math.PI-d*Math.PI/180),pt=d=>({x:400+Math.cos(rad(d))*r,y:370-Math.sin(rad(d))*r}),a=pt(startDeg),b=pt(endDeg),sweep=endDeg>startDeg?1:0;arc.setAttribute('d',`M ${a.x} ${a.y} A ${r} ${r} 0 0 ${sweep} ${b.x} ${b.y}`)}
-function protractorPos(deg){const p=proPoint(deg,320);$('protractorNavian').style.left=p.x/800*100+'%';$('protractorNavian').style.top=p.y/424*100+'%';setProtractorLine(deg);setProtractorArc(window.protractorArcStart??0,deg)}
-function startProtractor(){clearInterval(timerId);timerId=null;cancelAnimationFrame(anim);anim=null;locked=false;$('start').classList.add('hidden');$('result').classList.add('hidden');$('app').classList.remove('hidden');$('normalGame').classList.add('hidden');$('protractorGame').classList.remove('hidden');$('brandHint').textContent=mode==='challenge'?'60秒で分度器を読んでつかまえよう':'分度器の目盛を読んで、1°単位で答えよう';$('stepLabel').textContent='1°刻み';$('recordTitle').textContent=mode==='challenge'?'チャレンジ（分度器）':'ハンター（分度器）';$('challengePanel').classList.toggle('hidden',mode!=='challenge');if(mode==='challenge'){score=0;timeLeft=60;renderStats();timerId=setInterval(()=>{timeLeft--;renderStats();if(timeLeft<=0){clearInterval(timerId);timerId=null;finishChallenge()}},1000)}else{renderStats()}buildProtractor();requestAnimationFrame(spawnProtractor)}
-function spawnProtractor(){locked=false;$('protractorNext').style.display='none';$('degreeInput').value='';$('degreeInput').className='degree-input';$('degreeSubmit').disabled=true;$('protractorNavian').className='protractor-navian';$('protractorRay').className='protractor-ray show';$('protractorCorrectLine').className='protractor-correct-line';$('protractorNavian').src=NAV+randomNav();target=Math.floor(Math.random()*179)+1;const fromLeft=Math.random()<.5;protractorVisualTarget=fromLeft?target:180-target;window.protractorArcStart=fromLeft?0:180;$('protractorLabel').textContent=fromLeft?'左の0°から読もう':'右の0°から読もう';$('protractorLabel').className='protractor-label';setProtractorArc(window.protractorArcStart,window.protractorArcStart);$('protractorNavian').classList.add('running');const t0=performance.now(),duration=1050;function tick(t){const p=Math.min(1,(t-t0)/duration),e=1-Math.pow(1-p,2),deg=window.protractorArcStart+(protractorVisualTarget-window.protractorArcStart)*e;protractorPos(deg);if(p<1)anim=requestAnimationFrame(tick);else{locked=true;anim=null;protractorPos(protractorVisualTarget);$('protractorNavian').classList.remove('running');$('degreeSubmit').disabled=false}}anim=requestAnimationFrame(tick)}
-function answerProtractor(){if(!locked)return;const input=$('degreeInput'),value=Number(input.value);if(!Number.isInteger(value)||value<0||value>180)return;locked=false;$('degreeSubmit').disabled=true;stats.attempts++;const ok=Math.abs(value-target)<=1;if(ok){stats.correct++;score++;recordNavianGet($('protractorNavian').src);input.classList.add('protractor-correct');$('protractorNavian').classList.add('caught');$('protractorCorrectLine').className='protractor-correct-line show';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro('ぴったり！ '+target+'°','hit')}else{stats.weak[target]=(stats.weak[target]||0)+1;input.classList.add('protractor-wrong');$('protractorCorrectLine').className='protractor-correct-line show';setProtractorLine(protractorVisualTarget);setProtractorArc(window.protractorArcStart,protractorVisualTarget);feedbackPro('正解は '+target+'°。目盛をもう一度確認しよう','miss')}saveStats();renderStats();if(mode==='challenge'){setTimeout(()=>{if(timeLeft>0)spawnProtractor()},ok?260:380)}else $('protractorNext').style.display='inline-flex'}function feedbackPro(text,kind){$('protractorLabel').textContent=text;$('protractorLabel').className='protractor-label '+kind}
-function title(){clearInterval(timerId);timerId=null;cancelAnimationFrame(anim);anim=null;locked=false;$('app').classList.add('hidden');$('result').classList.add('hidden');$('book').classList.add('hidden');$('start').classList.remove('hidden')}function openBook(){clearInterval(timerId);timerId=null;cancelAnimationFrame(anim);anim=null;locked=false;$('start').classList.add('hidden');$('app').classList.add('hidden');$('book').classList.remove('hidden');const g=$('bookGrid');g.innerHTML='';NAVIANS.forEach((f,i)=>{const c=document.createElement('div');c.className='book-card';c.innerHTML=`<img src="${NAV+f}" alt="${NAMES[i]}"><span>${NAMES[i]}</span>`;g.appendChild(c)})}
-document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();startGame(b.dataset.mode,b.dataset.step||30)}));$('next').onclick=spawn;$('protractorNext').onclick=spawnProtractor;$('titleBtn').onclick=title;$('resultTitle').onclick=title;$('again').onclick=()=>startGame('challenge',step);$('bookBack').onclick=title;$('degreeSubmit').onclick=answerProtractor;$('degreeInput').addEventListener('keydown',e=>{if(e.key==='Enter')answerProtractor()});renderStats();
-</script>
-<script>
-// STANDALONE_BOOK_LINK
-document.addEventListener('click',function(e){
-  const b=e.target.closest('.book-mode');
-  if(b){e.preventDefault();e.stopImmediatePropagation();location.href='book.html';}
-},true);
-</script>
+/* =========================================================================
+   ANGLE HUNTER - MVP (HUNTモードのみ)
+   設計方針: 「分度器で答えを出す」のではなく「まず角度を感じて分度器で確かめる」
+   後で拡張しやすいように CONFIG / STATE / 描画関数 / ロジック関数を分離している。
+   将来の拡張ポイント:
+     - MONSTER_RENDERERS にキーを増やせば見た目を差し替え可能（今はプレースホルダ絵文字）
+     - CONFIG.levels に難易度を追加すれば LEVEL 3以降(10°/5°/自由角度)にも対応可能
+     - MEASURE / CHALLENGE モードは同じ STATE.center / STATE.radius を使って追加できる
+   ========================================================================= */
 
-</body></html>
+(function () {
+  "use strict";
+
+  /* ---------------- CONFIG ---------------- */
+  const CONFIG = {
+    center: { x: 200, y: 200 },
+    fieldRadius: 150,      // モンスターや目盛りの外側半径
+    tickOuter: 150,
+    tickInnerMajor: 132,
+    tickInnerMinor: 141,
+    labelRadius: 118,
+    monsterRadius: 150,
+    netTravelMs: 380,
+    revealDelayMs: 550,
+    levels: {
+      30: { step: 30, label: "かんたん(30°)" },
+      15: { step: 15, label: "ふつう(15°)" }
+    },
+    storageKey: "angleHunter.stats.v1"
+  };
+
+  /* ---------------- STATE ---------------- */
+  const STATE = {
+    step: 30,
+    currentAngle: null,   // 出題中の正解角度
+    answered: false,
+    stats: loadStats()
+  };
+
+  /* ---------------- DOM参照 ---------------- */
+  const svg = document.getElementById("fieldSvg");
+  const angleButtonsEl = document.getElementById("angleButtons");
+  const nextBtn = document.getElementById("nextBtn");
+  const messageEl = document.getElementById("message");
+  const levelSwitchEl = document.getElementById("levelSwitch");
+
+  /* ============================================================
+     初期化
+     ============================================================ */
+  function init() {
+    drawStarfield();
+    buildField();
+    bindLevelSwitch();
+    buildAngleButtons();
+    const sidebar = document.querySelector('.stat-sidebar');
+    sidebar.appendChild(angleButtonsEl);
+    sidebar.appendChild(nextBtn);
+    updateStatsPanel();
+    spawnMonster();
+
+    nextBtn.addEventListener("click", () => {
+      resetForNextQuestion();
+      spawnMonster();
+    });
+  }
+
+  /* ============================================================
+     背景の星（装飾。ロジックとは無関係）
+     ============================================================ */
+  function drawStarfield() {
+    const canvas = document.getElementById("stars");
+    const ctx = canvas.getContext("2d");
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      render();
+    }
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      const count = Math.floor((canvas.width * canvas.height) / 9000);
+      // シード的に固定感を出すため毎回ランダムでOK（装飾のみ）
+      for (let i = 0; i < count; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        const r = Math.random() * 1.3;
+        ctx.globalAlpha = Math.random() * 0.8 + 0.2;
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+    window.addEventListener("resize", resize);
+    resize();
+  }
+
+  /* ============================================================
+     SVGフィールド（円・目盛り・分度器）の構築
+     ============================================================ */
+  function buildField() {
+    const { x: cx, y: cy } = CONFIG.center;
+    svg.innerHTML = ""; // クリア
+
+    // 外側の円（フィールド）
+    addSvg("circle", {
+      cx, cy, r: CONFIG.fieldRadius + 14,
+      class: "field-ring-outer"
+    });
+    addSvg("circle", {
+      cx, cy, r: CONFIG.fieldRadius,
+      class: "field-ring"
+    });
+
+    // 分度器の目盛り（常時表示）: 15°刻みで目盛り、30°刻みで数字ラベル
+    for (let deg = 0; deg < 360; deg += 15) {
+      const isMajor = deg % 30 === 0;
+      const rad = degToRad(deg);
+      const outer = polarPoint(cx, cy, CONFIG.tickOuter, rad);
+      const inner = polarPoint(cx, cy, isMajor ? CONFIG.tickInnerMajor : CONFIG.tickInnerMinor, rad);
+      addSvg("line", {
+        x1: outer.x, y1: outer.y, x2: inner.x, y2: inner.y,
+        class: isMajor ? "tick-major" : "tick-minor"
+      });
+      if (isMajor) {
+        const labelPos = polarPoint(cx, cy, CONFIG.labelRadius, rad);
+        addSvg("text", {
+          x: labelPos.x, y: labelPos.y,
+          class: "tick-label",
+          "text-anchor": "middle",
+          "dominant-baseline": "middle"
+        }, String(deg));
+      }
+    }
+
+    // 中心点
+    addSvg("circle", { cx, cy, r: 5, class: "center-dot" });
+
+    // 正解角度を後で示す点線（初期は非表示）
+    const cLine = addSvg("line", {
+      x1: cx, y1: cy, x2: cx, y2: cy,
+      class: "correct-line", id: "correctLine"
+    });
+
+    // ねらいの矢印（モンスター方向）
+    addSvg("line", { x1: cx, y1: cy, x2: cx, y2: cy, class: "aim-arrow", id: "aimArrow" });
+    addSvg("polygon", { points: "0,0 0,0 0,0", class: "aim-arrow-head", id: "aimArrowHead" });
+
+    // 網のライン（アニメーション用）
+    addSvg("line", { x1: cx, y1: cy, x2: cx, y2: cy, class: "net-line", id: "netLine" });
+
+    // モンスター（プレースホルダ絵文字。将来は edu-assets の画像に差し替え可能）
+    const monsterG = addSvg("g", { class: "monster-group", id: "monsterGroup" });
+    const monsterText = document.createElementNS(svgNS(), "text");
+    monsterText.setAttribute("id", "monsterEmoji");
+    monsterText.setAttribute("font-size", "34");
+    monsterText.setAttribute("text-anchor", "middle");
+    monsterText.setAttribute("dominant-baseline", "middle");
+    monsterText.textContent = "👾";
+    monsterG.appendChild(monsterText);
+  }
+
+  /* ============================================================
+     モンスター出現
+     ============================================================ */
+  function spawnMonster() {
+    const steps = 360 / STATE.step;
+    const angle = Math.floor(Math.random() * steps) * STATE.step;
+    STATE.currentAngle = angle;
+    STATE.answered = false;
+
+    const { x: cx, y: cy } = CONFIG.center;
+    const rad = degToRad(angle);
+    const pos = polarPoint(cx, cy, CONFIG.monsterRadius, rad);
+
+    document.getElementById("monste<script src="js/app.js"></script>
