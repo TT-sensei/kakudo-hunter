@@ -28,17 +28,14 @@ body{overflow:auto}.book-shell{width:min(1120px,100%);margin:auto;padding:18px}
 </main>
 <script src="js/monsters.js"></script>
 <script>
-const V2='angleHunter.navianGets.v2',V1='angleHunter.navianGets.v1';
-function read(k){try{return JSON.parse(localStorage.getItem(k))||{}}catch(e){return{}}}
-const gets2=read(V2),gets1=read(V1),grid=document.getElementById('bookGrid');
-const legacy=new Set(['acorn-leafy','aurora-shell-lizard','autumn-mushroom','berry-leafy','bubblefin-frog','candy-coral-slug','cloud-rain-rabbit','clover-mandragora','cobalt-blade-mantis','coral-bubble-crab','dusk-feather-owl','forest-puru','happa-squirrel-leafy','hinoko-ember-newt','kinoko-apple-mushroom','komorin-little-night-bat','koro-golem-pebble-golem','mofu-wolf-frost-pup','purun-little-magic-slime','yukimaru-snow-puff']);
+const gets2=read('angleHunter.navianGets.v2'),grid=document.getElementById('bookGrid');
 let discovered=0;
 for(const level of [1,2,3]){
  const title=document.createElement('h2');title.className='book-group-title';title.textContent=level===1?'レベル1　ナビアン':level===2?'レベル2　エボナビ':'レベル3　ボスナビ';grid.appendChild(title);
  const wrap=document.createElement('div');wrap.className='book-group-grid';
  MONSTERS.filter(m=>m.level===level).forEach(m=>{
    const oldKey=m.file.replace(/\.webp$/,'');
-   const count=Number(gets2[m.id]||0)+(level===1&&legacy.has(oldKey)?Number(gets1[m.file]||0):0);
+   const count=Number(gets2[m.id]||0);
    if(count) discovered++;
    const card=document.createElement('article');card.className='book-card'+(count?'':' locked');
    const img=document.createElement('img');img.src=MONSTER_BASE+m.path+'/'+m.file;img.alt=count?m.name:'未発見のモンスター';img.loading='lazy';
