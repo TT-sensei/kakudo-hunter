@@ -1,4 +1,4 @@
-import { soundList } from 'https://raw.githubusercontent.com/TT-sensei/sounds-recipe-/main/sounds.js';
+import { soundList } from 'https://tt-sensei.github.io/sounds-recipe-/sounds.js';
 
 let audioContext=null;
 let muted=localStorage.getItem('angleHunter.soundMuted')==='1';
