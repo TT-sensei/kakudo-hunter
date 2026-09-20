@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>ナビアン図鑑 - ANGLE HUNTER</title>
+<title>モンスター図鑑 - ANGLE HUNTER</title>
 <style>
 :root{--bg:#eef3f7;--navy:#17233b;--muted:#667085;--line:#d9e1ea;--gold:#e3a400}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -12,9 +12,9 @@ body{overflow:auto}.book-shell{width:min(1120px,100%);margin:auto;padding:18px}
 .book-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
 .book-head h1{margin:0;font-size:clamp(1.4rem,4vw,2rem)}.book-head p{margin:4px 0 0;color:var(--muted);font-size:.78rem}.book-head p b{color:var(--navy)}
 .head-btn{min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--navy);font-weight:800;cursor:pointer}
-.book-group-title{margin:22px 0 10px;font-size:1.05rem}.book-group-title:first-child{margin-top:0}
+.book-group-title{display:flex;align-items:baseline;justify-content:space-between;margin:22px 0 10px;font-size:1.05rem}.book-group-title:first-child{margin-top:0}.book-group-title small{color:var(--muted);font-size:.72rem;font-weight:800}
 .book-group-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
-.book-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:8px;text-align:center;box-shadow:0 3px 10px rgba(24,42,67,.06)}
+.book-card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:8px;text-align:center;box-shadow:0 3px 10px rgba(24,42,67,.06);transition:transform .16s ease,box-shadow .16s ease}.book-card:active{transform:scale(.97)}
 .book-card img{display:block;width:100%;height:125px;object-fit:contain}.book-card span{display:block;font-size:.72rem;font-weight:800;line-height:1.35}.book-card small{display:block;margin-top:4px;color:var(--muted);font-size:.62rem;font-weight:800}
 .book-card.locked img{filter:brightness(0);opacity:.82}.book-card.locked span{color:#7b8492}
 @media(max-width:900px){.book-group-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
@@ -23,19 +23,18 @@ body{overflow:auto}.book-shell{width:min(1120px,100%);margin:auto;padding:18px}
 </head>
 <body>
 <main class="book-shell">
-<header class="book-head"><div><h1>ナビアン図鑑</h1><p>発見したモンスター <b id="bookProgress">0 / 0 種</b></p></div><button class="head-btn" id="bookBack">タイトルへ</button></header>
-<section id="bookGrid" aria-label="ナビアン図鑑"></section>
+<header class="book-head"><div><h1>モンスター図鑑</h1><p>発見したモンスター <b id="bookProgress">0 / 0 種</b></p></div><button class="head-btn" id="bookBack">タイトルへ</button></header>
+<section id="bookGrid" aria-label="モンスター図鑑"></section>
 </main>
 <script src="js/monsters.js"></script>
 <script>
-const gets2=read('angleHunter.navianGets.v2'),grid=document.getElementById('bookGrid');
+let gets2={};try{gets2=JSON.parse(localStorage.getItem('angleHunter.navianGets.v2')||'{}')||{}}catch(e){}const grid=document.getElementById('bookGrid');
 let discovered=0;
 for(const level of [1,2,3]){
- const title=document.createElement('h2');title.className='book-group-title';title.textContent=level===1?'レベル1　ナビアン':level===2?'レベル2　エボナビ':'レベル3　ボスナビ';grid.appendChild(title);
+ const levelMonsters=MONSTERS.filter(m=>m.level===level);const title=document.createElement('h2');title.className='book-group-title';title.innerHTML=`<span>${level===1?'レベル1　ナビアン':level===2?'レベル2　エボナビ':'レベル3　ボスナビ'}</span><small>${levelMonsters.filter(m=>Number(gets2[m.id]||0)>0).length} / ${levelMonsters.length}</small>`;grid.appendChild(title);
  const wrap=document.createElement('div');wrap.className='book-group-grid';
- MONSTERS.filter(m=>m.level===level).forEach(m=>{
-   const oldKey=m.file.replace(/\.webp$/,'');
-   const count=Number(gets2[m.id]||0);
+ levelMonsters.forEach(m=>{
+    const count=Number(gets2[m.id]||0);
    if(count) discovered++;
    const card=document.createElement('article');card.className='book-card'+(count?'':' locked');
    const img=document.createElement('img');img.src=MONSTER_BASE+m.path+'/'+m.file;img.alt=count?m.name:'未発見のモンスター';img.loading='lazy';
