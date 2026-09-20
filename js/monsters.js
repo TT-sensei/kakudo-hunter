@@ -1,121 +1,9 @@
 const MONSTER_BASE='https://raw.githubusercontent.com/TT-sensei/navi-character-/main/assets/web/fantasy/monsters/';
 const MONSTERS=[
   {
-    "id": "zako/acorn-leafy",
-    "file": "acorn-leafy.webp",
-    "name": "どんぐりリーフ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/aurora-shell-lizard",
-    "file": "aurora-shell-lizard.webp",
-    "name": "オーロラシェルリザード",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/autumn-mushroom",
-    "file": "autumn-mushroom.webp",
-    "name": "オータムキノコ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/berry-leafy",
-    "file": "berry-leafy.webp",
-    "name": "ベリーリーフ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/bubblefin-frog",
-    "file": "bubblefin-frog.webp",
-    "name": "バブルフィンカエル",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/candy-coral-slug",
-    "file": "candy-coral-slug.webp",
-    "name": "キャンディコーラルナメクジ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/cloud-rain-rabbit",
-    "file": "cloud-rain-rabbit.webp",
-    "name": "くもあめウサギ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/clover-mandragora",
-    "file": "clover-mandragora.webp",
-    "name": "クローバーマンドラゴラ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/cobalt-blade-mantis",
-    "file": "cobalt-blade-mantis.webp",
-    "name": "コバルトブレードカマキリ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/coral-bubble-crab",
-    "file": "coral-bubble-crab.webp",
-    "name": "コーラルバブルクラブ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/dusk-feather-owl",
-    "file": "dusk-feather-owl.webp",
-    "name": "たそがれフクロウ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/forest-puru",
-    "file": "forest-puru.webp",
-    "name": "森ぷる",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
     "id": "zako/happa-squirrel-leafy",
     "file": "happa-squirrel-leafy.webp",
     "name": "はっぱリス",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/hinoko-ember-newt",
-    "file": "hinoko-ember-newt.webp",
-    "name": "ひのこイモリ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/kinoko-apple-mushroom",
-    "file": "kinoko-apple-mushroom.webp",
-    "name": "りんごキノコ",
     "tier": "ナビアン",
     "level": 1,
     "path": "zako"
@@ -129,33 +17,9 @@ const MONSTERS=[
     "path": "zako"
   },
   {
-    "id": "zako/koro-golem-pebble-golem",
-    "file": "koro-golem-pebble-golem.webp",
-    "name": "ころゴーレム",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/mofu-wolf-frost-pup",
-    "file": "mofu-wolf-frost-pup.webp",
-    "name": "もふウルフ",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
     "id": "zako/purun-little-magic-slime",
     "file": "purun-little-magic-slime.webp",
     "name": "ぷるんスライム",
-    "tier": "ナビアン",
-    "level": 1,
-    "path": "zako"
-  },
-  {
-    "id": "zako/yukimaru-snow-puff",
-    "file": "yukimaru-snow-puff.webp",
-    "name": "ゆきまるスノーパフ",
     "tier": "ナビアン",
     "level": 1,
     "path": "zako"
@@ -217,6 +81,14 @@ const MONSTERS=[
     "path": "zako"
   },
   {
+    "id": "zako/cloud-rain-rabbit",
+    "file": "cloud-rain-rabbit.webp",
+    "name": "くもあめウサギ",
+    "tier": "ナビアン",
+    "level": 1,
+    "path": "zako"
+  },
+  {
     "id": "zako/pebble-ram",
     "file": "pebble-ram.webp",
     "name": "こいしラム",
@@ -233,9 +105,25 @@ const MONSTERS=[
     "path": "zako"
   },
   {
+    "id": "zako/bubblefin-frog",
+    "file": "bubblefin-frog.webp",
+    "name": "バブルフィンカエル",
+    "tier": "ナビアン",
+    "level": 1,
+    "path": "zako"
+  },
+  {
     "id": "zako/ribbon-tailed-mouse",
     "file": "ribbon-tailed-mouse.webp",
     "name": "リボンテイルねずみ",
+    "tier": "ナビアン",
+    "level": 1,
+    "path": "zako"
+  },
+  {
+    "id": "zako/cobalt-blade-mantis",
+    "file": "cobalt-blade-mantis.webp",
+    "name": "コバルトブレードカマキリ",
     "tier": "ナビアン",
     "level": 1,
     "path": "zako"
@@ -276,6 +164,14 @@ const MONSTERS=[
     "id": "zako/pond-mirror-spirit",
     "file": "pond-mirror-spirit.webp",
     "name": "みずうみミラー精霊",
+    "tier": "ナビアン",
+    "level": 1,
+    "path": "zako"
+  },
+  {
+    "id": "zako/candy-coral-slug",
+    "file": "candy-coral-slug.webp",
+    "name": "キャンディコーラルナメクジ",
     "tier": "ナビアン",
     "level": 1,
     "path": "zako"
