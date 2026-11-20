@@ -105,3 +105,29 @@
     grid-row:4;
   }
 }
+/* Place mode: same learning pattern (stage left, controls right). */
+#placeGame.game{display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
+#placeGame #placeView{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto auto minmax(0,1fr) auto;gap:12px;padding:12px}
+#placeGame .place-card{grid-column:1;grid-row:1 / 5;width:min(100%,880px);justify-self:center;align-self:center}
+#placeGame .protractor-label{grid-column:2;grid-row:1;align-self:end;margin:0}
+#placeGame .place-status{grid-column:2;grid-row:2;align-self:start}
+#placeGame .protractor-question{position:relative;grid-column:2;grid-row:3;align-self:start;display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:10px;padding:16px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 3px 10px rgba(24,42,67,.05)}
+#placeGame .protractor-help{font-size:.85rem;font-weight:800;color:var(--navy);white-space:nowrap}
+#placeGame .degree-input{width:100%;height:60px}
+#placeGame .degree-submit{width:100%;min-height:56px}
+#placeGame .degree-unit{position:absolute;right:16px;top:82px;margin:0}
+#placeGame #placeNext{grid-column:2;grid-row:4;width:100%;justify-self:stretch}
+@media (max-height:700px){
+#placeGame #placeView{grid-template-columns:minmax(0,1fr) 280px}
+#placeGame .protractor-question{padding:12px}
+}
+@media (max-width:700px) and (orientation:portrait){
+  #placeGame #placeView{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto;gap:10px;padding:8px}
+  #placeGame .place-card{grid-column:1;grid-row:1;width:min(100%,430px);justify-self:center}
+  #placeGame .protractor-label{grid-column:1;grid-row:2;align-self:start}
+  #placeGame .place-status{grid-column:1;grid-row:3}
+  #placeGame .protractor-question{grid-column:1;grid-row:4;padding:12px}
+  #placeGame #placeNext{grid-column:1;grid-row:5}
+}
+/* style.cssの横向き一括ルール（.protractor-helpの58px下げ）をあてようモードでは打ち消す */
+#placeGame .protractor-help{transform:none;grid-column:auto;grid-row:auto;align-self:auto;justify-self:auto}
