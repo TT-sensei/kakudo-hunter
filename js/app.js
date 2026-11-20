@@ -142,11 +142,12 @@ function plWireDrag() {
   svg.addEventListener('pointerup', end);
   svg.addEventListener('pointercancel', end);
 }
-function drawPlaceAngle() {
+function drawPlaceAngle(cur) {
+  if (cur === undefined) cur = PL.target;
   const g = $('placeAngle'), NS = 'http://www.w3.org/2000/svg';
   g.innerHTML = '';
   const mk = (tag, attrs) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); g.appendChild(e); return e; };
-  const endDeg = PL.baseDeg + PL.side * PL.target;
+  const endDeg = PL.baseDeg + PL.side * cur;
   const b = plPt(PL.baseDeg, 300), e2 = plPt(endDeg, 300);
   mk('path', { d: `M ${PLV.x} ${PLV.y} L ${b.x} ${b.y} A 300 300 0 0 ${PL.side > 0 ? 0 : 1} ${e2.x} ${e2.y} Z`, fill: 'rgba(22,139,104,.12)', stroke: 'none' });
   const ab = plPt(PL.baseDeg, 105), ae = plPt(endDeg, 105);
@@ -157,7 +158,8 @@ function drawPlaceAngle() {
   const np = plPt(endDeg, 332);
   const img = $('placeNavian');
   img.setAttribute('x', np.x - 40); img.setAttribute('y', np.y - 40);
-  img.setAttribute('href', MONSTER_BASE + currentNavian.path + '/' + currentNavian.file);
+  const url = MONSTER_BASE + currentNavian.path + '/' + currentNavian.file;
+  if (img.getAttribute('href') !== url) img.setAttribute('href', url);
   img.classList.remove('caught');
   const ring = $('placeRing');
   ring.setAttribute('cx', np.x); ring.setAttribute('cy', np.y); ring.setAttribute('opacity', 0);
@@ -170,18 +172,29 @@ function spawnPlace() {
   const endPlus = PL.baseDeg + PL.target, endMinus = PL.baseDeg - PL.target;
   const okPlus = endPlus <= 220, okMinus = endMinus >= -40;
   PL.side = okPlus && okMinus ? (Math.random() < .5 ? 1 : -1) : okPlus ? 1 : -1;
-  drawPlaceAngle();
+  drawPlaceAngle(0);
   // 分度器は、頂点から離れた位置・ずれた角度から始める
   const off = (20 + Math.random() * 140) * Math.PI / 180, dist = 150 + Math.random() * 60;
   PL.x = Math.min(600, Math.max(200, PLV.x + Math.cos(off) * dist));
   PL.y = Math.min(380, Math.max(190, PLV.y - Math.sin(off) * dist * .8));
   const rotOff = (30 + Math.random() * 45) * (Math.random() < .5 ? 1 : -1);
   PL.rot = plNorm(plCorrectRot() + rotOff);
-  PL.centerOk = false; PL.rotState = null; PL.wasAligned = false; PL.answering = true;
-  plEvalSnap(); plApplyTransform(); plUpdateStatus();
+  PL.centerOk = false; PL.rotState = null; PL.wasAligned = false; PL.answering = false;
+  plEvalSnap(); plApplyTransform();
+  $('placeStatus').textContent = 'ナビアンが止まるまで見ていよう'; $('placeStatus').className = 'place-status';
   $('placeInput').value = ''; $('placeInput').className = 'degree-input';
   $('placeLabel').textContent = '分度器を当てよう'; $('placeLabel').className = 'protractor-label';
   $('placeNext').style.display = 'none';
+  // 他モードと同じく、角度が「開く」アニメーションで出題する
+  cancelAnimationFrame(anim);
+  const t0 = performance.now(), dur = 1000;
+  function tick(t) {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 2);
+    drawPlaceAngle(PL.target * e);
+    if (p < 1) anim = requestAnimationFrame(tick);
+    else { anim = null; drawPlaceAngle(PL.target); PL.answering = true; plUpdateStatus(); }
+  }
+  anim = requestAnimationFrame(tick);
 }
 function startPlace() {
   clearInterval(timerId); timerId = null; cancelAnimationFrame(anim); anim = null; locked = false;
